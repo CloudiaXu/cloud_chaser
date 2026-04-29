@@ -1,0 +1,19 @@
+node_modules
+dist
+.DS_Store
+*.log
+.vite
+.env
+.env.local
+
+# Dev/iteration screenshots — kept on disk for reference but not in repo
+/iteration-*.png
+/hero-*.png
+/header-*.png
+/ChatGPT Image*.png
+/Screenshot*.png
+src/svg/Screenshot*.png
+
+# Playwright artefacts
+.playwright-mcp/
+.playwright/

@@ -1,0 +1,684 @@
+:root {
+  --bg: #05070d;
+  --bg-2: #0a0f1c;
+  /* Final palette — blue accent on near-black, light text.
+     Matches the mockup design intent. */
+  --fg: #e8eef9;
+  --fg-dim: #8a96b0;
+  --accent: #7ad6ff;
+  --accent-soft: rgba(122, 214, 255, 0.6);
+  --line: rgba(120, 160, 220, 0.18);
+  --font-display: "Inter", "Helvetica Neue", -apple-system, BlinkMacSystemFont,
+    "Noto Sans TC", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  /* Design width lock: the mockup is sized for 1920-wide layout.
+     We use a max-width content frame matched to that width. */
+}
+
+/* Design guide — the actual mockup pressed underneath, scaled to
+   match the design intent at 1920 wide. Toggle with G/F.
+   This is a dev tool; remove or hide before shipping. */
+#design-guide {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1920px;
+  z-index: 0;
+  pointer-events: none;
+  /* DEV: cranked up so contrast vs our red implementation is obvious. */
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+#design-guide img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+#design-guide.hidden {
+  opacity: 0;
+}
+#design-guide.faded {
+  opacity: 0.08;
+}
+#design-guide.bright {
+  opacity: 0.5;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+
+.nav {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Measured from mockup pixels: brand text top at screen y=87,
+     right-nav right edge at screen x≈1829. */
+  padding: 87px 90px;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  max-width: 1920px;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-soft);
+}
+
+.nav nav {
+  display: flex;
+  gap: 80px;
+}
+
+.nav nav a {
+  color: var(--fg-dim);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav nav a:hover {
+  color: var(--fg);
+}
+
+/* Hero: matched to mockup proportions (mockup hero @ 1920w = 1170px tall).
+   Content is top-aligned (mockup text sits in upper third). */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 1170px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  /* Slogan close to top, just below the fixed nav (~120px tall). */
+  padding: 160px 100px 80px;
+  pointer-events: none;
+  max-width: 1820px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-copy {
+  max-width: 720px;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* Static SVG typography: drop-in hero text rendered as dots+lines+halos
+   from /public/text.svg. SVG colors are baked red (DEV palette) so it
+   contrasts with the blue mockup design-guide during alignment.
+   Restore blue colors in text.svg before shipping. */
+.hero-text-svg {
+  display: block;
+  width: 720px;
+  max-width: none;
+  height: auto;
+  /* SVG sits flush with hero-copy top so the slogan reads as the
+     first thing in the viewport. Negative margin-bottom collapses
+     the SVG's empty viewBox padding so the .lede follows tightly.
+     margin-left = -(90 cx × 720 width / 1216 viewBox) ≈ -53px so
+     the leftmost letter ('C') aligns with the lede paragraph below. */
+  margin: 0 0 -40px -53px;
+  pointer-events: none;
+}
+
+.hero h1 {
+  font-size: clamp(48px, 6vw, 112px);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  font-weight: 200;
+  margin-bottom: 32px;
+  /* Hidden visually — the .hero-text-svg above replaces it.
+     Kept in DOM for SEO + screen readers. Position absolute so
+     it doesn't push the rest of hero-copy down. */
+  visibility: hidden;
+  position: absolute;
+  pointer-events: none;
+}
+
+.hero h1 .accent {
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.lede {
+  /* Bumped from 18-22 → 24-32: hero副標需要明顯大小才有閱讀重量感 */
+  font-size: clamp(24px, 1.8vw, 32px);
+  line-height: 1.55;
+  color: var(--fg);
+  margin-bottom: 28px;
+  font-weight: 400;
+}
+
+.sub {
+  /* Bumped from 14-16 → 18-22: 即使是次要敘述也要可讀 */
+  font-size: clamp(18px, 1.3vw, 22px);
+  line-height: 1.7;
+  color: var(--fg-dim);
+  margin-bottom: 56px;
+}
+
+.cta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  padding: 14px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease,
+    border-color 0.2s ease;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+}
+
+.btn-primary {
+  border-color: var(--accent-soft);
+  background: rgba(78, 160, 255, 0.06);
+}
+
+.btn-primary:hover {
+  background: rgba(78, 160, 255, 0.12);
+  border-color: var(--accent);
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-dim);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+
+.scroll-hint .chev {
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+
+/* ─── About section ───────────────────────────────────── */
+/* Mockup proportions: ~13% of total = ~510px tall at 1920 wide. */
+.about {
+  position: relative;
+  z-index: 1;
+  max-width: 1820px;
+  margin: 0 auto;
+  padding: 80px 100px 80px;
+  min-height: 510px;
+  pointer-events: none;
+}
+
+.section-tag {
+  display: inline-block;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: clamp(28px, 3.4vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 60px;
+  pointer-events: auto;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 60px;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.about-text p {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--fg-dim);
+  margin-bottom: 14px;
+}
+
+.about-photo {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-frame {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #11151f 0%, #1c2233 100%);
+  position: relative;
+  z-index: 2;
+}
+
+.photo-ring {
+  position: absolute;
+  inset: -60px;
+  z-index: 1;
+  pointer-events: none;
+}
+.photo-ring svg {
+  position: absolute;
+  inset: 0;
+}
+
+.about-side {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.side-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.side-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  position: relative;
+}
+
+.side-tag {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.side-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-dim);
+}
+
+/* ─── What I Do ───────────────────────────────────────── */
+/* Mockup: ~9% of total = ~360px tall. */
+.what-i-do {
+  position: relative;
+  z-index: 1;
+  max-width: 1820px;
+  margin: 0 auto;
+  padding: 60px 100px 80px;
+  min-height: 360px;
+  pointer-events: none;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
+  margin-top: 36px;
+  pointer-events: auto;
+}
+
+.service {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.service-icon {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.service h3 {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.service p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-dim);
+}
+
+/* ─── Selected Work ──────────────────────────────────── */
+/* Mockup: ~11% of total = ~430px tall. */
+.work {
+  position: relative;
+  z-index: 1;
+  max-width: 1820px;
+  margin: 0 auto;
+  padding: 80px 100px 80px;
+  min-height: 430px;
+  pointer-events: none;
+}
+
+.tag-dot {
+  color: var(--accent);
+}
+.tag-strong {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  pointer-events: auto;
+}
+
+.work-card {
+  position: relative;
+  background: rgba(20, 24, 36, 0.6);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 24px 24px;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.work-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--fg-dim);
+  margin-bottom: 12px;
+}
+
+.work-card h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.work-card p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--fg-dim);
+  margin-bottom: 24px;
+  max-width: 60%;
+}
+
+.link-arrow {
+  font-size: 12px;
+  color: var(--fg-dim);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
+  margin-top: auto;
+}
+.link-arrow:hover {
+  color: var(--fg);
+}
+
+.work-visual {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+}
+
+/* ─── Thinking ───────────────────────────────────────── */
+/* Mockup: ~12% of total = ~470px tall. */
+.thinking {
+  position: relative;
+  z-index: 1;
+  max-width: 1820px;
+  margin: 0 auto;
+  padding: 60px 100px 80px;
+  min-height: 470px;
+  pointer-events: none;
+}
+
+.thinking-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  pointer-events: auto;
+}
+
+.thinking-card {
+  position: relative;
+  background: rgba(20, 24, 36, 0.4);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.thinking-card .date {
+  font-size: 11px;
+  color: var(--fg-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.thinking-card h3 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  max-width: 65%;
+}
+
+.thinking-visual {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+}
+
+.thinking-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  pointer-events: auto;
+}
+
+/* ─── Footer / Let's Combine ─────────────────────────── */
+/* Mockup: ~15% of total = ~580px tall (incl. small footer strip below). */
+.footer {
+  position: relative;
+  z-index: 1;
+  max-width: 1820px;
+  margin: 0 auto;
+  padding: 40px 100px 40px;
+  min-height: 580px;
+  pointer-events: auto;
+}
+
+.footer-card {
+  background: rgba(20, 24, 36, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-title {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+.footer-lede {
+  font-size: 13px;
+  color: var(--fg-dim);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.footer-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-icon {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 11px;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding: 0 24px;
+}
+
+.footer-social {
+  display: flex;
+  gap: 16px;
+}
+.footer-social a {
+  color: var(--fg-dim);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.copyright {
+  font-size: 11px;
+  color: var(--fg-dim);
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 720px) {
+  .nav {
+    padding: 18px 20px;
+  }
+  .nav nav {
+    gap: 16px;
+    font-size: 12px;
+  }
+  .hero {
+    padding: 100px 20px 60px;
+  }
+  .about,
+  .what-i-do,
+  .work,
+  .thinking,
+  .footer {
+    padding: 60px 20px 80px;
+  }
+  .about-grid,
+  .services-grid,
+  .work-grid,
+  .thinking-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

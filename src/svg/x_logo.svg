@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="55%" r="65%">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="60%" stop-color="#03070f"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <radialGradient id="starHero" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#cdedff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#3fb6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="starMid" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#cdedff"/>
+      <stop offset="100%" stop-color="#3fb6ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow" x="-300%" y="-300%" width="700%" height="700%">
+      <feGaussianBlur stdDeviation="1.2" result="b1"/>
+      <feGaussianBlur stdDeviation="3.5" in="SourceGraphic" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="heroGlow" x="-300%" y="-300%" width="700%" height="700%">
+      <feGaussianBlur stdDeviation="2.4" result="b1"/>
+      <feGaussianBlur stdDeviation="7" in="SourceGraphic" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#bg)"/>
+
+  <!--
+    X letter rendered as a constellation.
+    Stroke ╲ : TL → a1 → CROSS → a2 → BR (5 stars, slight curve)
+    Stroke ╱ : TR → b1 → CROSS → b2 → BL (5 stars, decisive)
+    CROSS at (215,220) — offset right+down from geometric center for hand-drawn feel.
+    Two floating off-pattern stars give the star-map authenticity.
+  -->
+
+  <!-- Connection lines: each segment slightly varied opacity for hand-drawn feel -->
+  <g stroke="#cdedff" stroke-linecap="round" fill="none">
+    <!-- ╲ stroke -->
+    <line x1="62"  y1="72"  x2="135" y2="148" stroke-width="0.85" stroke-opacity="0.5"/>
+    <line x1="135" y1="148" x2="215" y2="220" stroke-width="1.0"  stroke-opacity="0.65"/>
+    <line x1="215" y1="220" x2="288" y2="292" stroke-width="0.95" stroke-opacity="0.6"/>
+    <line x1="288" y1="292" x2="352" y2="346" stroke-width="0.85" stroke-opacity="0.5"/>
+    <!-- ╱ stroke -->
+    <line x1="338" y1="68"  x2="272" y2="138" stroke-width="0.85" stroke-opacity="0.5"/>
+    <line x1="272" y1="138" x2="215" y2="220" stroke-width="0.95" stroke-opacity="0.6"/>
+    <line x1="215" y1="220" x2="146" y2="288" stroke-width="0.95" stroke-opacity="0.6"/>
+    <line x1="146" y1="288" x2="58"  y2="354" stroke-width="1.0"  stroke-opacity="0.65"/>
+  </g>
+
+  <!-- Mid stars along each stroke -->
+  <g filter="url(#starGlow)">
+    <circle cx="135" cy="148" r="2.6" fill="url(#starMid)"/>
+    <circle cx="288" cy="292" r="2.4" fill="url(#starMid)"/>
+    <circle cx="272" cy="138" r="2.4" fill="url(#starMid)"/>
+    <circle cx="146" cy="288" r="2.6" fill="url(#starMid)"/>
+  </g>
+
+  <!-- Off-pattern floating stars (the "stargazer" outliers) -->
+  <g filter="url(#starGlow)" opacity="0.7">
+    <circle cx="312" cy="226" r="1.6" fill="url(#starMid)"/>
+    <circle cx="92"  cy="198" r="1.5" fill="url(#starMid)"/>
+  </g>
+
+  <!-- Endpoint hero stars (4 tips of the X) — asymmetric sizes for signature feel -->
+  <g filter="url(#heroGlow)">
+    <circle cx="62"  cy="72"  r="4.6" fill="url(#starHero)"/>   <!-- TL -->
+    <circle cx="338" cy="68"  r="3.8" fill="url(#starHero)"/>   <!-- TR (smaller) -->
+    <circle cx="352" cy="346" r="4.2" fill="url(#starHero)"/>   <!-- BR -->
+    <circle cx="58"  cy="354" r="5.6" fill="url(#starHero)"/>   <!-- BL (biggest endpoint, signature anchor) -->
+  </g>
+
+  <!-- Center crossing — brightest, biggest star (offset from geometric center) -->
+  <g filter="url(#heroGlow)">
+    <circle cx="215" cy="220" r="7.0" fill="url(#starHero)"/>
+  </g>
+
+  <!-- White pin highlights on the brightest 2 stars -->
+  <circle cx="215" cy="220" r="1.5" fill="#ffffff"/>
+  <circle cx="58"  cy="354" r="1.0" fill="#ffffff"/>
+</svg>
