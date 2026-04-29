@@ -191,7 +191,10 @@ requestAnimationFrame((t) => {
 // live at their own world-Y, and they'll naturally enter/leave view.
 function applyScrollOffset() {
   const scrollY = window.scrollY;
-  const worldHeight = 2 * 60 * Math.tan(Math.PI / 8); // ≈ 49.7
+  // World units per pixel — uses live camera distance so the offset
+  // stays consistent when handleResize() pulls the camera back on
+  // narrow (mobile-portrait) viewports.
+  const worldHeight = 2 * scene.camera.position.z * Math.tan(Math.PI / 8);
   const worldPerPx = worldHeight / window.innerHeight;
   scene.scene.position.y = scrollY * worldPerPx;
 }

@@ -2,12 +2,15 @@
   --bg: #05070d;
   --bg-2: #0a0f1c;
   /* Final palette — blue accent on near-black, light text.
-     Matches the mockup design intent. */
+     --accent is the canonical brand blue, matched 1:1 with the
+     particle bird's color (Scene.ts: 0x4ea0ff). Every shade below
+     derives from the same RGB (78, 160, 255) so the slogan, the
+     bird, the buttons, and the borders all read as one hue family. */
   --fg: #e8eef9;
   --fg-dim: #8a96b0;
-  --accent: #7ad6ff;
-  --accent-soft: rgba(122, 214, 255, 0.6);
-  --line: rgba(120, 160, 220, 0.18);
+  --accent: #4ea0ff;
+  --accent-soft: rgba(78, 160, 255, 0.6);
+  --line: rgba(78, 160, 255, 0.18);
   --font-display: "Inter", "Helvetica Neue", -apple-system, BlinkMacSystemFont,
     "Noto Sans TC", sans-serif;
 }
@@ -124,12 +127,15 @@ body {
   color: var(--fg);
 }
 
-/* Hero: matched to mockup proportions (mockup hero @ 1920w = 1170px tall).
-   Content is top-aligned (mockup text sits in upper third). */
+/* Hero: fills exactly one viewport so SCROLL hint always sits at the
+   bottom of the visible area, regardless of laptop / desktop size.
+   (Originally hard-coded 1170px from the 1920w mockup, but on 14"
+   laptops with 782px viewports that left ~340px of empty dark space
+   between CTA and ABOUT ME.) */
 .hero {
   position: relative;
   z-index: 1;
-  min-height: 1170px;
+  min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
@@ -154,14 +160,15 @@ body {
 .hero-text-svg {
   display: block;
   width: 720px;
-  max-width: none;
+  max-width: 100%;
   height: auto;
-  /* SVG sits flush with hero-copy top so the slogan reads as the
-     first thing in the viewport. Negative margin-bottom collapses
-     the SVG's empty viewBox padding so the .lede follows tightly.
-     margin-left = -(90 cx × 720 width / 1216 viewBox) ≈ -53px so
-     the leftmost letter ('C') aligns with the lede paragraph below. */
-  margin: 0 0 -40px -53px;
+  margin: 0 0 -40px 0;
+  /* SVG content starts at cx=90 inside a 1216-wide viewBox = 7.4% of
+     the SVG's own rendered width is empty padding on the left.
+     translateX(-7.4%) shifts the box that exact amount so the
+     leftmost letter ('C') aligns with the .lede below at ANY breakpoint
+     (margin-left in px breaks when width changes responsively). */
+  transform: translateX(-7.4%);
   pointer-events: none;
 }
 
@@ -238,7 +245,8 @@ body {
 .scroll-hint {
   position: absolute;
   left: 50%;
-  bottom: 32px;
+  bottom: 200px;  /* clear of the hero's tall padding so it sits in
+                     the visible viewport on a typical desktop (1080-1440px) */
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -655,24 +663,100 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   RESPONSIVE BREAKPOINTS
+   • Tablet (≤ 1200px): grids drop from 3-col to 2-col, paddings shrink,
+     hero text scales but stays in 2-zone layout.
+   • Mobile (≤ 720px): everything single-column, hero SVG fluid-width,
+     hero min-height collapses, nav simplifies.
+   ────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .nav {
+    padding: 56px 60px;
+    font-size: 16px;
+  }
+  .nav nav { gap: 48px; }
+
+  .hero {
+    padding: 120px 56px 60px;
+    min-height: 100vh;
+  }
+  .hero-text-svg {
+    width: min(560px, 70vw);
+    margin: 0 0 -30px 0;
+  }
+
+  .about,
+  .what-i-do,
+  .work,
+  .thinking {
+    padding: 100px 56px 100px;
+  }
+  .footer { padding: 100px 56px; }
+
+  .section-title { font-size: clamp(28px, 4vw, 40px); }
+
+  /* About: single column with photo above, side stack below. */
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .about-photo { max-width: 480px; margin: 0 auto; }
+
+  /* What I Do / Work / Thinking: 2-column grids on tablet. */
+  .services-grid,
+  .work-grid,
+  .thinking-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
 @media (max-width: 720px) {
   .nav {
-    padding: 18px 20px;
+    padding: 24px 20px;
+    font-size: 14px;
   }
   .nav nav {
     gap: 16px;
-    font-size: 12px;
+    font-size: 13px;
   }
+
   .hero {
     padding: 100px 20px 60px;
+    /* Fill the viewport on mobile so the SCROLL hint sits at the
+     visible bottom (otherwise hero collapses to content height
+     and SCROLL ends up tucked right under the CTA buttons). */
+    min-height: 100vh;
   }
+  .hero-copy { max-width: 100%; }
+  .hero-text-svg {
+    width: 107%;  /* 100% + 7.4% to compensate for the translateX, so
+                     the visual content fills the column edge-to-edge */
+    margin: 0 0 -20px 0;
+  }
+
+  .lede   { font-size: clamp(18px, 4.5vw, 22px); margin-bottom: 20px; }
+  .sub    { font-size: clamp(14px, 3.6vw, 17px); margin-bottom: 32px; }
+  .scroll-hint { bottom: 40px; }  /* hugs viewport bottom on mobile */
+  .cta    { flex-wrap: wrap; gap: 12px; }
+  .btn    { padding: 14px 20px; font-size: 14px; }
+
   .about,
   .what-i-do,
   .work,
   .thinking,
   .footer {
-    padding: 60px 20px 80px;
+    padding: 64px 20px 80px;
   }
+
+  /* All grids collapse to a single column on phone. */
   .about-grid,
   .services-grid,
   .work-grid,
@@ -680,5 +764,22 @@ body {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+  .about-photo { max-width: 100%; }
+  .photo-frame { aspect-ratio: 4 / 5; }
+
+  /* Cards on mobile: visuals shrink so they don't dominate the text. */
+  .work-visual,
+  .thinking-visual,
+  .service-icon { max-width: 200px; height: auto; }
+
+  /* Section titles scale down. */
+  .section-title { font-size: clamp(22px, 6vw, 32px); }
+
+  /* Footer: brand + social link cluster collapses to centered stack. */
+  .footer-bottom {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
   }
 }

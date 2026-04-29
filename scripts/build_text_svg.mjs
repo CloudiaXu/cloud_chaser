@@ -30,13 +30,26 @@ svg = svg.replace(
   '<!-- bg removed -->'
 );
 
-// 2. Tint the pure-white cores into a pale blue so the slogan reads as
-// "blue typography" rather than "white text on dark". The two SOLID
-// `<g fill="#ffffff">` layers (small bright dots) become #cdedff, and
-// the innermost gradient stops (#ffffff in radialGradient defs) also
-// shift so the dots' centers tint pale-blue instead of harsh white.
-svg = svg.split('"#ffffff"').join('"#cdedff"')
-         .split('#ffffff').join('#cdedff');
+// 2. Recolor the slogan body to brand blue — but ONLY the dominant
+// visible layers (the bright line stroke and the solid dot cores).
+// Gradient stops at #ffffff inside <radialGradient> defs are
+// preserved so each dot still has a bright white center fading
+// to blue, giving the letters a "starfield" quality rather than
+// flat solid blue.
+//
+//   • <g fill="#ffffff">      → <g fill="#4ea0ff">   (solid dots)
+//   • <g stroke="#e8f6ff">    → <g stroke="#4ea0ff"> (bright lines)
+//
+// VALUE then re-overrides both back to white below (step 5 + 6) so
+// it reads as the bright "answer" to the blue setup — the inverted
+// hierarchy makes white-on-blue pop harder than any blue-on-blue
+// contrast could.
+const SLOGAN_BLUE = '#4ea0ff';
+svg = svg.split('<g fill="#ffffff">').join(`<g fill="${SLOGAN_BLUE}">`);
+svg = svg.split('stroke="#e8f6ff"').join(`stroke="${SLOGAN_BLUE}"`);
+// Soft outer stroke (was #7ad6ff opacity 0.3) — also unify to bird blue
+// so the letter edges don't bleed cyan when antialiased / blurred.
+svg = svg.split('stroke="#7ad6ff"').join(`stroke="${SLOGAN_BLUE}"`);
 
 // Constants for the typography:
 const ORIG_RX = 33;     // half-width of all letters in this SVG
@@ -54,6 +67,21 @@ const LINE_BANDS = [
 ];
 function lineOf(y) {
   return LINE_BANDS.findIndex((b) => y >= b.yMin && y <= b.yMax);
+}
+
+// Slogan color zoning. Default is brand blue (set via parent <g>);
+// white is applied as per-element overrides. The white regions are:
+//   • Entire line 2 ("THE DOTS,")
+//   • Right half of line 3 ("VALUE.", x >= VALUE_X_THRESHOLD)
+// Defined here (above pass A/B) so the polyline → O-circle conversion
+// in pass B can also stamp stroke="#ffffff" on line-2's O letter.
+const VALUE_X_THRESHOLD = 670;
+const VALUE_COLOR = '#ffffff';
+function isWhiteRegion(x, y) {
+  if (y >= LINE_BANDS[1].yMin && y <= LINE_BANDS[1].yMax) return true;
+  if (y >= LINE_BANDS[2].yMin && y <= LINE_BANDS[2].yMax &&
+      x >= VALUE_X_THRESHOLD) return true;
+  return false;
 }
 
 // Pass A — find each O letter (closed circular polyline) and record the
@@ -165,7 +193,14 @@ svg = svg.replace(/<polyline\s+points="([^"]+)"\s*\/>/g, (orig, ptsStr) => {
         (o) => Math.abs(o.oldCx - cx) < 1 && Math.abs(o.oldCy - cy) < 1
       );
       if (matched) {
-        return `<circle cx="${matched.newCx}" cy="${matched.oldCy}" r="${NEW_R}"/>`;
+        // O letters in white regions (e.g. line 2 "DOTS") need an
+        // explicit stroke="#ffffff" — otherwise the new circle inherits
+        // the parent <g stroke="#4ea0ff"> blue and the O leaks blue
+        // into an otherwise-white line.
+        const strokeAttr = isWhiteRegion(matched.newCx, matched.oldCy)
+          ? ` stroke="${VALUE_COLOR}"`
+          : '';
+        return `<circle cx="${matched.newCx}" cy="${matched.oldCy}" r="${NEW_R}"${strokeAttr}/>`;
       }
     }
   }
@@ -177,25 +212,63 @@ svg = svg.replace(/<polyline\s+points="([^"]+)"\s*\/>/g, (orig, ptsStr) => {
   return `<polyline points="${shifted.join(' ')}"/>`;
 });
 
-// 5. Make "VALUE" deeper blue than the rest. VALUE+. spans roughly
-// cx 670-1130 in line 3 (y 400-540). Add an explicit `stroke=`
-// attribute to each polyline whose points all fall inside that bbox
-// — the attribute overrides the parent <g stroke=...> color.
-const VALUE_BBOX = { xMin: 670, xMax: 1130, yMin: 400, yMax: 540 };
-const VALUE_STROKE = '#5ec6ff'; // a step deeper than the bird's #7ad6ff
+// 4b. Bump dot radii 3× for stronger presence. Skip the O letter
+// outline circles (r=55) — those are typography, not dots.
+const DOT_SCALE = 2;
+svg = svg.replace(/<circle\s+([^/]*?)r="([\d.]+)"\s*\/>/g, (orig, prefix, rStr) => {
+  const r = parseFloat(rStr);
+  if (r >= 20) return orig; // O letter outline — leave alone
+  return `<circle ${prefix}r="${(r * DOT_SCALE).toFixed(2)}"/>`;
+});
 
+// 5. Apply white overrides to polylines and solid-dot circles in white
+// regions (definitions hoisted above pass A so step 4 could also use them).
+
+// 5a. Polylines (letter line strokes). A polyline becomes white only
+// when ALL its points fall in a white region — partial overlap (e.g.
+// a stray dot crossing line 2's yMax) shouldn't recolor a whole letter.
 svg = svg.replace(/<polyline\s+points="([^"]+)"\s*\/>/g, (orig, ptsStr) => {
   const pts = ptsStr.trim().split(/\s+/).map((p) => {
     const [x, y] = p.split(',').map(Number);
     return { x, y };
   });
-  const inValue = pts.every(
-    (p) => p.x >= VALUE_BBOX.xMin && p.x <= VALUE_BBOX.xMax &&
-           p.y >= VALUE_BBOX.yMin && p.y <= VALUE_BBOX.yMax
-  );
-  if (!inValue) return orig;
-  return `<polyline points="${ptsStr}" stroke="${VALUE_STROKE}"/>`;
+  if (!pts.every((p) => isWhiteRegion(p.x, p.y))) return orig;
+  return `<polyline points="${ptsStr}" stroke="${VALUE_COLOR}"/>`;
 });
+
+// 5b. Solid dot circles in VALUE area → white. Scoped to ONLY the two
+// `<g fill="#4ea0ff">` blocks (formerly `<g fill="#ffffff">` solid
+// dot layers), because the other dot circles live inside gradient
+// `<g fill="url(#…)">` layers — overriding those with solid white
+// would flatten their halo gradients into white blobs.
+//
+// Walk through the SVG, find each `<g fill="#4ea0ff"> … </g>` block,
+// and inject `fill="#ffffff"` on circles whose center is in VALUE_BBOX.
+const SOLID_LAYER_OPEN = `<g fill="${SLOGAN_BLUE}">`;
+let cursor = 0;
+let rebuilt = '';
+while (cursor < svg.length) {
+  const openIdx = svg.indexOf(SOLID_LAYER_OPEN, cursor);
+  if (openIdx === -1) {
+    rebuilt += svg.slice(cursor);
+    break;
+  }
+  rebuilt += svg.slice(cursor, openIdx + SOLID_LAYER_OPEN.length);
+  const closeIdx = svg.indexOf('</g>', openIdx);
+  const block = svg.slice(openIdx + SOLID_LAYER_OPEN.length, closeIdx);
+  const recolored = block.replace(
+    /<circle\s+cx="([\d.]+)"\s+cy="([\d.]+)"\s+r="([\d.]+)"([^/]*)\/>/g,
+    (orig, cxStr, cyStr, rStr, tail) => {
+      const cx = parseFloat(cxStr);
+      const cy = parseFloat(cyStr);
+      if (!isWhiteRegion(cx, cy)) return orig;
+      return `<circle cx="${cxStr}" cy="${cyStr}" r="${rStr}"${tail} fill="${VALUE_COLOR}"/>`;
+    }
+  );
+  rebuilt += recolored + '</g>';
+  cursor = closeIdx + 4;
+}
+svg = rebuilt;
 
 fs.writeFileSync(DST, svg);
 console.log(`built text.svg: ${Os.length} O letters → circles r=${NEW_R}, post-O letters shifted +${FULL_GROW}`);
