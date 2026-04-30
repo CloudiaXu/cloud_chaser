@@ -575,6 +575,16 @@ body {
   pointer-events: none;
 }
 
+/* WHAT I DO uses its tag AS the section title (no separate h2) — bump
+   it to a heading scale matching the overlay. Overrides the global
+   13px section-tag weight. Only applies inside .what-i-do so it doesn't
+   leak into other sections. */
+.what-i-do > .section-tag {
+  font-size: clamp(28px, 2.4vw, 42px);
+  letter-spacing: 0.16em;
+  margin-bottom: clamp(28px, 2vw, 40px);
+}
+
 .services-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -583,30 +593,76 @@ body {
   pointer-events: auto;
 }
 
+/* Vertical hairline divider between cards — overlay shows a subtle
+   blue line separating the three services. Apply to all but the last
+   card so the rightmost card has no trailing line. */
+.service:not(:last-child) {
+  border-right: 1px solid rgba(78, 160, 255, 0.18);
+  padding-right: clamp(16px, 1.4vw, 28px);
+}
+
 .service {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  /* Horizontal layout matching the design guide:
+       [icon]  [title]
+              [body paragraph]
+     Grid template areas keeps the markup as 3 sibling elements (icon,
+     h3, p) without needing a wrapper div. */
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "icon title"
+    "icon body";
+  column-gap: 24px;
+  row-gap: 8px;
+  align-items: start;
 }
 
 .service-icon {
-  width: 80px;
-  height: 80px;
+  grid-area: icon;
+  /* Bumped to ~130px (was 80) — overlay icons render at ~120-140 wide,
+     small icons made the row read as compact list items instead of
+     "feature cards". */
+  width: clamp(80px, 7vw, 130px);
+  height: clamp(80px, 7vw, 130px);
   position: relative;
-  margin-bottom: 8px;
+  /* Vertically center the icon against the h3+p text block on its
+     right — overlay shows the icon middle aligning with the gap
+     between title and body, not the title's top. */
+  align-self: center;
+}
+
+.service-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
 }
 
 .service h3 {
-  font-size: 17px;
+  grid-area: title;
+  /* Bumped from 17 → ~28px at 1920w to match overlay's heading scale.
+     Service titles read as primary content within each card, not labels. */
+  font-size: clamp(18px, 1.55vw, 28px);
   font-weight: 500;
   color: var(--fg);
+  letter-spacing: 0.02em;
+  margin-top: clamp(2px, 0.4vw, 8px);
 }
 
 .service p {
-  font-size: 13px;
+  grid-area: body;
+  /* Bumped from 13 → ~17px at 1920w. */
+  font-size: clamp(14px, 1.0vw, 17px);
   line-height: 1.7;
   color: var(--fg-dim);
+  margin-top: clamp(8px, 0.6vw, 12px);
 }
+
+/* DEV palette — WHAT I DO is being aligned. Swap section-tag and h3
+   to red so they contrast with the blue design-guide overlay. Restore
+   to brand blue / --fg when the section is finalized. */
+.what-i-do .section-tag { color: #ff5252; }
+.service h3 { color: #ff5252; }
 
 /* ─── Selected Work ──────────────────────────────────── */
 /* Mockup: ~11% of total = ~430px tall. */
@@ -943,6 +999,13 @@ body {
   .thinking-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
+  }
+  /* Vertical separator only makes sense for 3-col desktop layout —
+     wraps to N-col grid here. Switch to a horizontal divider between
+     wrapped cards instead. */
+  .service:not(:last-child) {
+    border-right: none;
+    padding-right: 0;
   }
 
   .footer-grid {

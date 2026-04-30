@@ -240,25 +240,11 @@ if (photoRing) {
 // hexagon / radial-burst). Each shape semantically matches its label
 // — "currently building" / "domains" / "outward collaboration".
 
-// What I Do: 3 service icons (cube / flowchart / orbit) — visuals on LEFT.
-const serviceCrops = [
-  { x: 70, y: 880, w: 140, h: 140 },   // AI 產品開發 — wireframe cube
-  { x: 290, y: 890, w: 175, h: 130 },  // 流程與體驗設計 — flowchart
-  { x: 525, y: 880, w: 150, h: 140 },  // 商業思維 — orbit/planet
-];
-document.querySelectorAll<HTMLElement>('.service-icon').forEach((el, i) => {
-  sampleSvgFromImage(el, {
-    imagePath: REF,
-    crop: serviceCrops[i] ?? serviceCrops[0],
-    threshold: 0.12,
-    count: 110,
-    svgSize: 40,
-    drawLinks: true,
-    linkDistance: 14,
-    color: '#ff5252',
-    maxDotRadius: 2.6,
-  }).catch((e) => console.warn('service icon sample failed', i, e));
-});
+// What I Do: 3 service icons are now hand-composed inline SVG in
+// index.html (cube / flowchart / orbit) — sampling produced loose
+// dot clouds that didn't read as semantic shapes at small sizes.
+// See logo design memory: handcraft semantic marks, only use sampling
+// for atmospheric/decorative density.
 
 // Selected Work: visuals on RIGHT side of each card (sphere / torus / ROBOT).
 const workCrops = [

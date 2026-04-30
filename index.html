@@ -11,7 +11,7 @@
          Used during development to verify the website matches design intent.
          Press G to toggle, press F to fade. Hidden by default now that
          alignment work is done. -->
-    <div id="design-guide" class="hidden" aria-hidden="true">
+    <div id="design-guide" aria-hidden="true">
       <img src="/reference.png" alt="design guide" />
     </div>
 
@@ -188,17 +188,84 @@
         <span class="section-tag">WHAT I DO</span>
         <div class="services-grid">
           <div class="service">
-            <div class="service-icon" aria-hidden="true"></div>
+            <div class="service-icon" aria-hidden="true">
+              <!-- Isometric cube wireframe — edges rendered as dot streams
+                   (stroke-dasharray "0 3" + round linecap) to match the
+                   overlay's constellation aesthetic. 7 visible vertices
+                   form a hexagonal outline with a center "front corner"
+                   vertex that connects to 3 alternating outer points. -->
+              <svg viewBox="0 0 60 60" fill="none">
+                <g stroke="#ff5252" stroke-width="1.3" stroke-dasharray="0 3" stroke-linecap="round" opacity="0.75">
+                  <line x1="30" y1="8"  x2="50" y2="19" />
+                  <line x1="50" y1="19" x2="50" y2="41" />
+                  <line x1="50" y1="41" x2="30" y2="52" />
+                  <line x1="30" y1="52" x2="10" y2="41" />
+                  <line x1="10" y1="41" x2="10" y2="19" />
+                  <line x1="10" y1="19" x2="30" y2="8"  />
+                  <line x1="30" y1="30" x2="30" y2="8"  />
+                  <line x1="30" y1="30" x2="10" y2="41" />
+                  <line x1="30" y1="30" x2="50" y2="41" />
+                </g>
+                <g fill="#ff5252">
+                  <circle cx="30" cy="8"  r="1.7" />
+                  <circle cx="50" cy="19" r="1.7" />
+                  <circle cx="50" cy="41" r="1.7" />
+                  <circle cx="30" cy="52" r="1.7" />
+                  <circle cx="10" cy="41" r="1.7" />
+                  <circle cx="10" cy="19" r="1.7" />
+                  <circle cx="30" cy="30" r="2"   />
+                </g>
+              </svg>
+            </div>
             <h3>AI 產品開發</h3>
             <p>從使用者需求出發，設計能解決問題的 AI 產品與功能。</p>
           </div>
           <div class="service">
-            <div class="service-icon" aria-hidden="true"></div>
+            <div class="service-icon" aria-hidden="true">
+              <!-- Branching network — small tree of 8 nodes with branching
+                   connections, dotted edges. -->
+              <svg viewBox="0 0 60 60" fill="none">
+                <g stroke="#ff5252" stroke-width="1.3" stroke-dasharray="0 3" stroke-linecap="round" opacity="0.75">
+                  <line x1="13" y1="13" x2="30" y2="22" />
+                  <line x1="47" y1="13" x2="30" y2="22" />
+                  <line x1="30" y1="22" x2="14" y2="32" />
+                  <line x1="30" y1="22" x2="46" y2="32" />
+                  <line x1="14" y1="32" x2="30" y2="42" />
+                  <line x1="46" y1="32" x2="30" y2="42" />
+                  <line x1="30" y1="42" x2="13" y2="50" />
+                  <line x1="30" y1="42" x2="47" y2="50" />
+                </g>
+                <g fill="#ff5252">
+                  <circle cx="13" cy="13" r="1.7" />
+                  <circle cx="47" cy="13" r="1.7" />
+                  <circle cx="30" cy="22" r="2"   />
+                  <circle cx="14" cy="32" r="1.6" />
+                  <circle cx="46" cy="32" r="1.6" />
+                  <circle cx="30" cy="42" r="2"   />
+                  <circle cx="13" cy="50" r="1.7" />
+                  <circle cx="47" cy="50" r="1.7" />
+                </g>
+              </svg>
+            </div>
             <h3>流程與體驗設計</h3>
             <p>協助客服團隊優化諮詢流程，打造更順暢的使用者體驗與內部作業效率。</p>
           </div>
           <div class="service">
-            <div class="service-icon" aria-hidden="true"></div>
+            <div class="service-icon" aria-hidden="true">
+              <!-- Atomic-orbital pattern — 3 ellipses sharing a center,
+                   tilted at 0/60/-60° (three-orbit nucleus). NO spokes —
+                   matches the overlay's pure orbits topology. -->
+              <svg viewBox="0 0 60 60" fill="none">
+                <g stroke="#ff5252" stroke-width="1.3" stroke-dasharray="0 3" stroke-linecap="round" opacity="0.75" fill="none">
+                  <ellipse cx="30" cy="30" rx="22" ry="9" />
+                  <ellipse cx="30" cy="30" rx="22" ry="9" transform="rotate(60 30 30)" />
+                  <ellipse cx="30" cy="30" rx="22" ry="9" transform="rotate(-60 30 30)" />
+                </g>
+                <g fill="#ff5252">
+                  <circle cx="30" cy="30" r="2.4" />
+                </g>
+              </svg>
+            </div>
             <h3>商業思維</h3>
             <p>從成本、效率與成長的角度，思考產品如何創造商業價值。</p>
           </div>
