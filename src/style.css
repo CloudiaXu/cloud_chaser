@@ -884,12 +884,58 @@ body {
 
   .section-title { font-size: clamp(28px, 4vw, 40px); }
 
-  /* About: single column with photo above, side stack below. */
+  /* About — Tablet (≤1200): 2-col top (left = title+body, right = photo),
+     full-width carousel underneath. Use grid-template-areas so the
+     element-to-cell mapping is explicit and easy to flip on mobile.
+
+     Reset the 3-col desktop alignment hacks (min-height tied to
+     photo-size, negative margin compensating for ring overflow, side
+     rail glued to right edge) — those only made sense when text/photo/
+     side were siblings on the SAME row. */
   .about-grid {
-    grid-template-columns: 1fr;
-    gap: 48px;
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-areas:
+      "head  photo"
+      "body  photo"
+      "side  side";
+    gap: 32px 48px;
   }
-  .about-photo { max-width: 480px; margin: 0 auto; }
+  .about-text {
+    min-height: 0;
+    margin-top: 0;
+    /* Dissolve .about-text's box so .text-head + .text-body become
+       direct grid items — required so we can address them individually
+       in grid-template-areas. */
+    display: contents;
+  }
+  .text-head   { grid-area: head; }
+  .text-body   { grid-area: body; }
+  .about-photo { grid-area: photo; }
+  .about-side  { grid-area: side; }
+  .about-photo {
+    align-self: center;
+    margin: 0 auto;
+    max-width: 480px;
+  }
+  /* About-side: at tablet width there's enough room to lay all three
+     cards side-by-side beneath the text/photo block, so no swipe is
+     needed (each card stays a comfortable width). On phone it switches
+     to a swipe carousel because three cards in a row would be too
+     squeezed. */
+  .about-side {
+    justify-self: stretch;
+    width: auto;
+    flex-direction: row;
+    gap: 16px;
+  }
+  .side-item {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 18px;
+    border: 1px solid rgba(78, 160, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(20, 28, 45, 0.4);
+  }
 
   /* What I Do / Work / Thinking: 2-column grids on tablet. */
   .services-grid,
@@ -943,8 +989,7 @@ body {
     padding: 64px 20px 80px;
   }
 
-  /* All grids collapse to a single column on phone. */
-  .about-grid,
+  /* Phone: collapse what-i-do/work/thinking/footer to single col. */
   .services-grid,
   .work-grid,
   .thinking-grid,
@@ -952,11 +997,27 @@ body {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+  /* About on phone: single col stack with photo BETWEEN title and body
+     (visually anchors the person before describing what they do).
+     Override tablet's 2-col grid-template-areas. */
+  .about-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "head"
+      "photo"
+      "body"
+      "side";
+    gap: 24px;
+  }
   .about-photo {
     max-width: 100%;
-    min-height: 280px;
+    /* Cell sized to the ring's outer box (300px) so the photo block
+       sits in the EXACT visual middle between title and body — no
+       top-aligned dead space below. */
+    min-height: 300px;
+    align-items: center;
   }
-  /* Shrink the circle + ring proportionally on phones. */
+  /* Shrink the circle + ring for phones. */
   .photo-frame {
     width: 200px;
     height: 200px;
@@ -964,12 +1025,66 @@ body {
   .photo-ring {
     width: 300px;
     height: 300px;
+    /* Center ring on the cell center (frame is also align-items: center
+       so they share a center). Tablet/desktop variants use offset-based
+       positioning because their cells stretch beyond the ring. */
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  /* Phone: three cards side-by-side would be too cramped, so switch to
+     horizontal swipe carousel. Peek of next card (card ~78% wide)
+     telegraphs swipe affordance without needing a scrollbar/arrow. */
+  .about-side {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Bleed past section padding (20px on phone) so the rail spans
+       edge-to-edge instead of being indented. */
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 4px 20px;
+  }
+  .about-side::-webkit-scrollbar { display: none; }
+  .side-item {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
   }
 
   /* Cards on mobile: visuals shrink so they don't dominate the text. */
   .work-visual,
   .thinking-visual,
   .service-icon { max-width: 200px; height: auto; }
+
+  /* About-side becomes a horizontal swipe carousel on phones — vertical
+     stacking of three icon+text cards eats too much height for what is
+     fundamentally a "quick at-a-glance" rail. The peek of the next card
+     (cards are ~78% wide) telegraphs the swipe affordance without needing
+     a scrollbar or arrow indicator. */
+  .about-side {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    /* Bleed past the section's 20px side padding so the first card sits
+       flush left and the rail visually escapes the content margin. */
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 4px 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .about-side::-webkit-scrollbar { display: none; }
+  .side-item {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+    min-height: 0;
+    /* Light card surface so each slide reads as a discrete unit. */
+    padding: 18px;
+    border: 1px solid rgba(78, 160, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(20, 28, 45, 0.4);
+  }
 
   /* Section titles scale down. */
   .section-title { font-size: clamp(22px, 6vw, 32px); }
