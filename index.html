@@ -61,31 +61,85 @@
       </section>
 
       <section class="about" id="about">
-        <span class="section-tag">ABOUT ME</span>
-        <h2 class="section-title">創業者・產品人・解決問題的人</h2>
-
         <div class="about-grid">
           <div class="about-text">
-            <p>我相信，好的產品來自於真正理解問題。</p>
-            <p>過去在客服、AI 與產品領域的經驗，讓我看見許多企業在流程與工具上的落差。</p>
-            <p>現在，我專注於打造 ELEMI，一個讓 AI 真正落地、能解決問題的客服產品。</p>
+            <div class="text-head">
+              <span class="section-tag">ABOUT ME</span>
+              <h2 class="section-title">
+                <span>創業者 × 產品人</span>
+                <span>讓系統真正運作</span>
+              </h2>
+            </div>
+            <div class="text-body">
+              <p>多數問題，從來不是做不到，<br>而是設計、技術、商業與 AI，沒有被接在一起。</p>
+              <p class="text-break">我在做的，是把這些斷掉的地方接起來，<br>讓不同的能力，不再各自運作，而是成為同一個系統。</p>
+              <p class="text-break">讓一個想法，不只是存在，而是能真正運作。</p>
+            </div>
           </div>
 
           <div class="about-photo">
+            <!-- Photo halo: dense ring of dots is procedurally injected
+                 into .photo-ring by main.ts (ringConstellation). Procedural
+                 is the right call for atmospheric "halo glow" — handcrafted
+                 sparse constellations read too empty around a portrait. -->
             <div class="photo-ring" aria-hidden="true"></div>
-            <div class="photo-frame"></div>
+
+            <div class="photo-frame">
+              <img src="/profile/profile-photo.png" alt="XiaoYun Xu" class="photo-img" />
+            </div>
           </div>
 
           <div class="about-side">
             <div class="side-item">
-              <span class="side-icon" aria-hidden="true"></span>
+              <span class="side-icon" aria-hidden="true">
+                <!-- Cube wireframe — "currently building". -->
+                <svg viewBox="0 0 36 36" fill="none">
+                  <g stroke="rgba(78,160,255,0.55)" stroke-width="0.6">
+                    <path d="M 7 13 L 7 28 L 22 28 L 22 13 Z" />
+                    <path d="M 14 6 L 14 21 L 29 21 L 29 6 Z" />
+                    <line x1="7" y1="13" x2="14" y2="6" />
+                    <line x1="22" y1="13" x2="29" y2="6" />
+                    <line x1="22" y1="28" x2="29" y2="21" />
+                    <line x1="7" y1="28" x2="14" y2="21" />
+                  </g>
+                  <g fill="#bcdcff">
+                    <circle cx="7" cy="13" r="1.1" />
+                    <circle cx="22" cy="13" r="1.1" />
+                    <circle cx="22" cy="28" r="1.1" />
+                    <circle cx="7" cy="28" r="1.1" />
+                    <circle cx="14" cy="6" r="1.1" />
+                    <circle cx="29" cy="6" r="1.1" />
+                    <circle cx="29" cy="21" r="1.1" />
+                    <circle cx="14" cy="21" r="1.1" />
+                  </g>
+                </svg>
+              </span>
               <div>
                 <p class="side-tag">現在正在做</p>
                 <p class="side-text">ELEMI 創辦人</p>
               </div>
             </div>
             <div class="side-item">
-              <span class="side-icon" aria-hidden="true"></span>
+              <span class="side-icon" aria-hidden="true">
+                <!-- Hexagon with internal triangulation — "domains / network". -->
+                <svg viewBox="0 0 36 36" fill="none">
+                  <g stroke="rgba(78,160,255,0.55)" stroke-width="0.6">
+                    <path d="M 18 4 L 30 11 L 30 25 L 18 32 L 6 25 L 6 11 Z" />
+                    <line x1="18" y1="4" x2="18" y2="32" />
+                    <line x1="6" y1="11" x2="30" y2="25" />
+                    <line x1="30" y1="11" x2="6" y2="25" />
+                  </g>
+                  <g fill="#bcdcff">
+                    <circle cx="18" cy="4" r="1.1" />
+                    <circle cx="30" cy="11" r="1.1" />
+                    <circle cx="30" cy="25" r="1.1" />
+                    <circle cx="18" cy="32" r="1.1" />
+                    <circle cx="6" cy="25" r="1.1" />
+                    <circle cx="6" cy="11" r="1.1" />
+                    <circle cx="18" cy="18" r="1.4" />
+                  </g>
+                </svg>
+              </span>
               <div>
                 <p class="side-tag">專長領域</p>
                 <p class="side-text">
@@ -95,12 +149,34 @@
               </div>
             </div>
             <div class="side-item">
-              <span class="side-icon" aria-hidden="true"></span>
+              <span class="side-icon" aria-hidden="true">
+                <!-- Radial burst — "outward collaboration". -->
+                <svg viewBox="0 0 36 36" fill="none">
+                  <g stroke="rgba(78,160,255,0.55)" stroke-width="0.6">
+                    <circle cx="18" cy="18" r="13" />
+                    <line x1="18" y1="18" x2="18" y2="5" />
+                    <line x1="18" y1="18" x2="29" y2="11" />
+                    <line x1="18" y1="18" x2="29" y2="25" />
+                    <line x1="18" y1="18" x2="18" y2="31" />
+                    <line x1="18" y1="18" x2="7" y2="25" />
+                    <line x1="18" y1="18" x2="7" y2="11" />
+                  </g>
+                  <g fill="#bcdcff">
+                    <circle cx="18" cy="18" r="1.5" />
+                    <circle cx="18" cy="5" r="1" />
+                    <circle cx="29" cy="11" r="1" />
+                    <circle cx="29" cy="25" r="1" />
+                    <circle cx="18" cy="31" r="1" />
+                    <circle cx="7" cy="25" r="1" />
+                    <circle cx="7" cy="11" r="1" />
+                  </g>
+                </svg>
+              </span>
               <div>
                 <p class="side-tag">期待合作</p>
                 <p class="side-text">
-                  與 AI 應用更多企業<br />
-                  創造真正的價值
+                  與更多企業合作<br />
+                  用 AI 創造真正的價值
                 </p>
               </div>
             </div>

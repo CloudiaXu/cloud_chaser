@@ -280,7 +280,10 @@ body {
   z-index: 1;
   max-width: 1820px;
   margin: 0 auto;
-  padding: 80px 100px 80px;
+  /* Padding-x = 100px to align left text col with Hero copy.
+     Padding-top reduced (was 170): tag + h2 are now inside the grid's
+     left column, so the section just needs normal section padding. */
+  padding: 110px 100px 110px;
   min-height: 510px;
   pointer-events: none;
 }
@@ -301,77 +304,261 @@ body {
   pointer-events: auto;
 }
 
+/* About section uses the standard palette: section-tag and side-tag
+   in brand blue (--accent), title in --fg, body and side-text in
+   --fg-dim. Defined in their base rules above. */
+.about .section-title {
+  /* Two-line stacked title: "創業者 × 產品人" on top, "讓系統真正運作" below.
+     flex column with a small gap keeps them tight together as a single
+     title block. */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.4vw, 8px);
+  font-size: clamp(22px, 2.5vw, 40px);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  word-break: keep-all;
+  margin-bottom: clamp(24px, 2vw, 40px);
+}
+
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
+  /* Left col widened (1.5fr vs 1fr/1.2fr/1fr previously) so the 40px
+     title fits on one line at 1920w. Photo col reduced to 1fr — photo
+     (510) overflows col2 slightly via overflow:visible, which is fine
+     because there's still a comfortable gap to col3. */
+  grid-template-columns: 1.5fr 1fr 0.8fr;
   gap: 60px;
-  align-items: center;
+  align-items: start;
   pointer-events: auto;
+  /* Photo size + how far the visible dot ring extends past the photo
+     edge — both lifted to grid level so left/right cols can use them
+     to size and offset their content to the OUTER ring (not the photo
+     itself). */
+  --photo-size: clamp(280px, 22vw, 420px);
+  --ring-overflow-y: clamp(18px, 1.4vw, 26px);
+}
+
+.about-text {
+  /* Left column structure: head (tag + h2) at top, body (paragraphs)
+     after, quote pushed to bottom via margin-top: auto on .text-quote.
+     Sized so its top/bottom match the visible dot ring's top/bottom
+     around the photo. */
+  min-height: calc(var(--photo-size) + 2 * var(--ring-overflow-y));
+  margin-top: calc(-1 * var(--ring-overflow-y));
+  display: flex;
+  flex-direction: column;
+}
+
+.text-body {
+  /* Slight top margin separates body from h2 — naturally flows after
+     the head section. */
+  margin-top: clamp(20px, 1.5vw, 30px);
+}
+
+.text-quote {
+  /* Pushed to the bottom of the column, leaving the body close to the
+     head — gives the Steve Jobs citation the "closing thought" weight.
+     padding-top guarantees a visible gap from the body even when the
+     column is content-driven (auto distributes 0 in that case). */
+  margin-top: auto;
+  padding-top: clamp(28px, 2.2vw, 40px);
+  /* Reset blockquote default margins. */
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+.quote-attribution {
+  /* Match the quote body's font (italic Georgia) so the citation reads
+     as a continuation of the quote, not a separate UI label. */
+  font-family: Georgia, "Times New Roman", "Noto Serif TC", serif;
+  font-style: italic;
+  font-size: clamp(13px, 0.95vw, 17px);
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+  /* Tight to the quote body — they read as one citation block. The
+     space ABOVE the quote (between body paragraphs and quote) is
+     handled by flex margin-top: auto on .text-quote (defined earlier). */
+  text-align: left;
+  margin-top: clamp(6px, 0.5vw, 10px);
+  margin-bottom: 0;
+}
+
+.quote-body {
+  /* Italic serif gives the English quote a "moment of pause" against
+     the surrounding sans-serif Chinese — a small typographic shift that
+     marks it as a citation, not body copy. */
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", "Noto Serif TC", serif;
+  font-size: clamp(14px, 1.05vw, 19px);
+  line-height: 1.65;
+  color: var(--fg-dim);
+}
+
+/* Section-tag and h2 inside .about-text need to be block-level + the
+   correct top spacing. Override the global section-tag margin so the
+   spacing reads cleanly against the h2 below. */
+.about-text .section-tag {
+  display: block;
+  /* Bumped to ~26px at 1920w — anchors the column with stronger weight,
+     matching the bigger title and right-rail tags. */
+  font-size: clamp(15px, 1.4vw, 26px);
+  margin-bottom: clamp(14px, 1.2vw, 22px);
+}
+
+.about-text .section-title {
+  /* Reset margin-bottom — body paragraphs below pick up their own
+     margin-top instead of fighting an over-large title margin. */
+  margin-bottom: clamp(28px, 2vw, 40px);
 }
 
 .about-text p {
-  font-size: 14px;
-  line-height: 1.9;
+  /* Body text scales with viewport — ~22px at 1920w. */
+  font-size: clamp(15px, 1.15vw, 22px);
+  line-height: 1.75;
   color: var(--fg-dim);
-  margin-bottom: 14px;
+  margin-bottom: clamp(8px, 0.7vw, 14px);
+}
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Visual section break between problem statements (paras 1-2) and the
+   action statement (paras 3-4) — smaller now to match tighter overall
+   spacing, but still bigger than between-paragraph margin. */
+.about-text .text-break {
+  margin-top: clamp(14px, 1.1vw, 20px);
 }
 
 .about-photo {
   position: relative;
+  /* Stretch to row height (which is determined by the left text col).
+     Photo inside fills cell height with aspect-ratio:1, so photo size
+     == left col height — exactly the design's "中間的圖跟左邊區域等高". */
+  align-self: stretch;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* Top-align photo so its top edge matches left col top.
+     Without this, .about-photo cell stretches taller than the photo
+     (e.g. when side col is taller) and photo gets vertically centered
+     inside the cell, decoupling photo top from left col top. */
+  align-items: flex-start;
+  /* --photo-size is inherited from .about-grid (lifted up so left/right
+     cols can also reference it). Local override kept for fallback in
+     case .about-photo is rendered outside a grid context. */
 }
 
 .photo-frame {
-  width: 240px;
-  height: 240px;
+  /* Photo uses the shared --photo-size; ring sizes off the same var
+     so they're guaranteed to share a center. */
+  width: var(--photo-size);
+  height: var(--photo-size);
   border-radius: 50%;
-  background: linear-gradient(135deg, #11151f 0%, #1c2233 100%);
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  /* Subtle inner edge that picks up the constellation blue,
+     plus an outward glow that bleeds into the ring SVG. */
+  box-shadow:
+    inset 0 0 0 1px rgba(78, 160, 255, 0.35),
+    0 0 60px rgba(78, 160, 255, 0.12);
+  background: linear-gradient(135deg, #11151f 0%, #1c2233 100%);
 }
 
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Slight desaturate + cool tint so the portrait sits inside the
+     constellation palette instead of fighting it. */
+  filter: saturate(0.85) contrast(1.02);
+}
+
+/* Ring SVG: scales with the photo. Photo height tracks cell height
+   (stretch); ring sized as a multiple of that via container queries
+   would be cleanest, but a simpler trick works: position ring's edges
+   to overflow the photo by a fixed offset. */
 .photo-ring {
+  /* Sized off the shared --photo-size + 200 (100px overflow each side).
+     Positioned so its center matches the photo center: photo sits at
+     cell top (align-items: flex-start), so to center ring on photo
+     center, ring top = -100 (extends 100px above photo top, ring height
+     = photo + 200, so ring extends 100px below photo bottom too). */
   position: absolute;
-  inset: -60px;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(var(--photo-size) + 200px);
+  height: calc(var(--photo-size) + 200px);
   z-index: 1;
   pointer-events: none;
-}
-.photo-ring svg {
-  position: absolute;
-  inset: 0;
+  overflow: visible;
 }
 
 .about-side {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: clamp(28px, 2.2vw, 40px);
+  /* Push the side-items column to the right edge of its grid cell —
+     the design's right rail sits flush with the section's right padding,
+     not at col3's left edge. */
+  justify-self: end;
+  /* Cap width so items don't stretch and fill the whole col3 — they
+     should hug the right edge as a tight cluster. */
+  width: max-content;
+  max-width: 100%;
+  /* Pad the top so the first item's text aligns with the h2 in the
+     left col. Left col is pulled up by --ring-overflow-y so its h2 is
+     also that much higher; subtract the same amount here so side1 still
+     lands on h2. (53 = tag height + tag margin; minus ring overflow.) */
+  padding-top: calc(clamp(36px, 2.85vw, 53px) - var(--ring-overflow-y));
 }
 
 .side-item {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: clamp(14px, 1.1vw, 20px);
+  /* Force all 3 items to equal height — the tallest natural content
+     (item with 2-line description) sets the baseline; shorter items
+     pad with empty space below. Keeps the right rail visually rhythmic. */
+  min-height: clamp(86px, 6.8vw, 130px);
 }
 
 .side-icon {
-  width: 36px;
-  height: 36px;
+  /* Icon scales with viewport — ~80px at 1920w to match the larger
+     right-side text. */
+  width: clamp(54px, 4.2vw, 80px);
+  height: clamp(54px, 4.2vw, 80px);
   flex-shrink: 0;
   margin-top: 2px;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.side-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
 }
 
 .side-tag {
-  font-size: 12px;
+  /* First row of each side item — kept large (~22px at 1920w) for
+     visual weight, matching the bigger icons. */
+  font-size: clamp(15px, 1.2vw, 22px);
   letter-spacing: 0.15em;
   color: var(--accent);
-  margin-bottom: 6px;
+  margin-bottom: clamp(6px, 0.6vw, 12px);
 }
 
 .side-text {
-  font-size: 13px;
+  /* Description text below the tag — kept moderate (~17px at 1920w)
+     so only the side-tag dominates as the "header" of each item. */
+  font-size: clamp(13px, 0.9vw, 17px);
   line-height: 1.7;
   color: var(--fg-dim);
 }
@@ -765,8 +952,19 @@ body {
     grid-template-columns: 1fr;
     gap: 24px;
   }
-  .about-photo { max-width: 100%; }
-  .photo-frame { aspect-ratio: 4 / 5; }
+  .about-photo {
+    max-width: 100%;
+    min-height: 280px;
+  }
+  /* Shrink the circle + ring proportionally on phones. */
+  .photo-frame {
+    width: 200px;
+    height: 200px;
+  }
+  .photo-ring {
+    width: 300px;
+    height: 300px;
+  }
 
   /* Cards on mobile: visuals shrink so they don't dominate the text. */
   .work-visual,

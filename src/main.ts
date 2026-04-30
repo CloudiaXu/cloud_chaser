@@ -220,38 +220,25 @@ document.querySelectorAll<HTMLElement>('[data-cta]').forEach((btn) => {
 
 const REF = '/reference.png';
 
-// About photo halo: keep the procedural ring (cleaner than sampling).
+// About photo halo: procedural dense ring of dots reads as atmospheric
+// "halo glow" around the portrait — better than handcrafted sparse
+// constellation (which felt empty in this size). DEV red palette.
 const photoRing = document.querySelector<HTMLElement>('.photo-ring');
 if (photoRing) {
   ringConstellation(photoRing, {
-    dotCount: 42,
-    radius: 150,
-    spread: 16,
-    color: '#ff5252',
+    /* Radius/spread tuned for the 420px photo at 1920w. */
+    dotCount: 210,
+    radius: 230,
+    spread: 28,
+    color: '#4ea0ff',
     drawChords: true,
-    maxDotRadius: 2.4,
+    maxDotRadius: 2.8,
   });
 }
 
-// About side icons (3 small constellation marks beside "現在正在做" etc.)
-const sideCrops = [
-  { x: 580, y: 605, w: 60, h: 60 },
-  { x: 580, y: 700, w: 60, h: 60 },
-  { x: 580, y: 790, w: 60, h: 60 },
-];
-document.querySelectorAll<HTMLElement>('.side-icon').forEach((el, i) => {
-  sampleSvgFromImage(el, {
-    imagePath: REF,
-    crop: sideCrops[i] ?? sideCrops[0],
-    threshold: 0.20,
-    count: 22,
-    svgSize: 18,
-    drawLinks: true,
-    linkDistance: 8,
-    color: '#ff5252',
-    maxDotRadius: 2.0,
-  }).catch((e) => console.warn('side icon sample failed', i, e));
-});
+// About side icons: hand-composed inline SVG in index.html (cube /
+// hexagon / radial-burst). Each shape semantically matches its label
+// — "currently building" / "domains" / "outward collaboration".
 
 // What I Do: 3 service icons (cube / flowchart / orbit) — visuals on LEFT.
 const serviceCrops = [
