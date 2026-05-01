@@ -85,9 +85,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Measured from mockup pixels: brand text top at screen y=87,
-     right-nav right edge at screen x≈1829. */
-  padding: 87px 90px;
+  /* Horizontal padding from mockup; vertical trimmed for tighter header. */
+  padding: 36px 90px;
   font-size: 18px;
   letter-spacing: 0.02em;
   max-width: 1920px;
@@ -283,17 +282,20 @@ body {
   /* Padding-x = 100px to align left text col with Hero copy.
      Padding-top reduced (was 170): tag + h2 are now inside the grid's
      left column, so the section just needs normal section padding. */
-  padding: 110px 100px 110px;
+  padding: 110px 100px 60px;
   min-height: 510px;
   pointer-events: none;
 }
 
 .section-tag {
-  display: inline-block;
-  font-size: 13px;
+  display: block;
+  /* Unified scale — ~26px at 1920w, matching ABOUT ME's tag.
+     All four sections (about / what-i-do / work / thinking) share
+     this scale so section openers feel consistent. */
+  font-size: clamp(15px, 1.4vw, 26px);
   letter-spacing: 0.22em;
   color: var(--accent);
-  margin-bottom: 24px;
+  margin-bottom: clamp(14px, 1.2vw, 22px);
 }
 
 .section-title {
@@ -394,17 +396,6 @@ body {
   font-size: clamp(14px, 1.05vw, 19px);
   line-height: 1.65;
   color: var(--fg-dim);
-}
-
-/* Section-tag and h2 inside .about-text need to be block-level + the
-   correct top spacing. Override the global section-tag margin so the
-   spacing reads cleanly against the h2 below. */
-.about-text .section-tag {
-  display: block;
-  /* Bumped to ~26px at 1920w — anchors the column with stronger weight,
-     matching the bigger title and right-rail tags. */
-  font-size: clamp(15px, 1.4vw, 26px);
-  margin-bottom: clamp(14px, 1.2vw, 22px);
 }
 
 .about-text .section-title {
@@ -570,19 +561,9 @@ body {
   z-index: 1;
   max-width: 1820px;
   margin: 0 auto;
-  padding: 60px 100px 80px;
+  padding: 20px 100px 80px;
   min-height: 360px;
   pointer-events: none;
-}
-
-/* WHAT I DO uses its tag AS the section title (no separate h2) — bump
-   it to a heading scale matching the overlay. Overrides the global
-   13px section-tag weight. Only applies inside .what-i-do so it doesn't
-   leak into other sections. */
-.what-i-do > .section-tag {
-  font-size: clamp(28px, 2.4vw, 42px);
-  letter-spacing: 0.16em;
-  margin-bottom: clamp(28px, 2vw, 40px);
 }
 
 .services-grid {
@@ -593,11 +574,10 @@ body {
   pointer-events: auto;
 }
 
-/* Vertical hairline divider between cards — overlay shows a subtle
-   blue line separating the three services. Apply to all but the last
-   card so the rightmost card has no trailing line. */
+/* Vertical hairline divider between cards — clear line separating
+   the three services. */
 .service:not(:last-child) {
-  border-right: 1px solid rgba(78, 160, 255, 0.18);
+  border-right: 1px solid rgba(78, 160, 255, 0.45);
   padding-right: clamp(16px, 1.4vw, 28px);
 }
 
@@ -619,11 +599,9 @@ body {
 
 .service-icon {
   grid-area: icon;
-  /* Bumped to ~130px (was 80) — overlay icons render at ~120-140 wide,
-     small icons made the row read as compact list items instead of
-     "feature cards". */
-  width: clamp(80px, 7vw, 130px);
-  height: clamp(80px, 7vw, 130px);
+  /* User-tuned size — icons read as feature illustrations, not list bullets. */
+  width: clamp(96px, 8.5vw, 160px);
+  height: clamp(96px, 8.5vw, 160px);
   position: relative;
   /* Vertically center the icon against the h3+p text block on its
      right — overlay shows the icon middle aligning with the gap
@@ -658,11 +636,6 @@ body {
   margin-top: clamp(8px, 0.6vw, 12px);
 }
 
-/* DEV palette — WHAT I DO is being aligned. Swap section-tag and h3
-   to red so they contrast with the blue design-guide overlay. Restore
-   to brand blue / --fg when the section is finalized. */
-.what-i-do .section-tag { color: #ff5252; }
-.service h3 { color: #ff5252; }
 
 /* ─── Selected Work ──────────────────────────────────── */
 /* Mockup: ~11% of total = ~430px tall. */
@@ -916,7 +889,7 @@ body {
 
 @media (max-width: 1200px) {
   .nav {
-    padding: 56px 60px;
+    padding: 24px 60px;
     font-size: 16px;
   }
   .nav nav { gap: 48px; }
@@ -1016,7 +989,7 @@ body {
 
 @media (max-width: 720px) {
   .nav {
-    padding: 24px 20px;
+    padding: 14px 20px;
     font-size: 14px;
   }
   .nav nav {
