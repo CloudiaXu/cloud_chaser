@@ -729,18 +729,6 @@ body {
   height: 100%;
   display: block;
 }
-.work-visual > .work-logo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  /* logo.svg ships white-fill; we keep it white but tint a soft blue
-     glow so it reads as part of the constellation palette. */
-  filter: drop-shadow(0 0 6px rgba(78, 160, 255, 0.55))
-          drop-shadow(0 0 14px rgba(78, 160, 255, 0.25));
-  opacity: 0.95;
-}
 /* Tracing reference (dev only). Faded image sits behind the SVG so we
    can place mesh vertices directly on top of the source artwork. Press
    T to toggle, Y to cycle opacity. */

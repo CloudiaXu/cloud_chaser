@@ -219,7 +219,7 @@ document.querySelectorAll<HTMLElement>('[data-cta]').forEach((btn) => {
 // ────────────────────────────────────────────────────────────────────
 // Card decorations (hand-composed inline SVG in index.html).
 // Procedural sampling was removed in favour of intentional star
-// placement — see feedback_logo_design_approach.md.
+// placement.
 // ────────────────────────────────────────────────────────────────────
 
 // About photo halo: procedural dense ring of dots reads as atmospheric
@@ -252,13 +252,11 @@ if (photoRing) {
 // in index.html (profile head / flow chain / shopping bot). Sampling
 // produced unreadable text-shaped dot piles at this size; semantic
 // silhouettes need intentional triangulation to read.
-// (See feedback_logo_design_approach.md — handcraft semantic marks.)
 
 // Thinking: 3 card visuals are now hand-composed inline SVG in
 // index.html (stuck-gear / handshake / rocket). Sampling produced
 // uninterpretable red dot scatter at 120px — semantic icons need
 // intentional star placement to read at this size.
-// (See feedback_logo_design_approach.md — handcraft semantic marks.)
 
 // Tracing-reference controls (dev only):
 //   T = hide / show

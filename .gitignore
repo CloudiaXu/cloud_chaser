@@ -1,6 +1,12 @@
 node_modules
 dist
 .DS_Store
+
+# Accidental Flutter scaffolding in this Vite repo
+/android/
+/ios/
+/macos/
+.dart_tool/
 *.log
 .vite
 .env
