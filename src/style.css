@@ -214,6 +214,9 @@ body {
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: inherit;
   font-size: 14px;
   letter-spacing: 0.02em;
@@ -225,6 +228,7 @@ body {
   border: 1px solid var(--line);
   background: transparent;
   color: var(--fg);
+  text-decoration: none;
 }
 
 .btn-primary {
@@ -718,6 +722,41 @@ body {
   height: 150px;
   pointer-events: none;
 }
+.work-visual > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.work-visual > .work-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* logo.svg ships white-fill; we keep it white but tint a soft blue
+     glow so it reads as part of the constellation palette. */
+  filter: drop-shadow(0 0 6px rgba(78, 160, 255, 0.55))
+          drop-shadow(0 0 14px rgba(78, 160, 255, 0.25));
+  opacity: 0.95;
+}
+/* Tracing reference (dev only). Faded image sits behind the SVG so we
+   can place mesh vertices directly on top of the source artwork. Press
+   T to toggle, Y to cycle opacity. */
+.work-visual > .ref-trace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.4;
+  filter: brightness(0.85) saturate(0.5);
+  pointer-events: none;
+}
+.work-visual > .ref-trace.hidden { display: none; }
+.work-visual > .ref-trace.faded  { opacity: 0.18; }
+.work-visual > .ref-trace.bright { opacity: 0.7; }
 
 /* ─── Thinking ───────────────────────────────────────── */
 /* Mockup: ~12% of total = ~470px tall. */
@@ -763,7 +802,11 @@ body {
   font-weight: 500;
   line-height: 1.5;
   margin-bottom: 24px;
-  max-width: 65%;
+  /* Reserve space for the top-right 120px visual (16px gap + 120px +
+     4px safety) so long titles never collide with the constellation
+     icon. Replaces the old `max-width: 65%` which broke at tablet
+     widths where 65% > available width. */
+  padding-right: 140px;
 }
 
 .thinking-visual {
@@ -790,7 +833,6 @@ body {
   max-width: 1820px;
   margin: 0 auto;
   padding: 40px 100px 40px;
-  min-height: 580px;
   pointer-events: auto;
 }
 
@@ -798,9 +840,31 @@ body {
   background: rgba(20, 24, 36, 0.5);
   border: 1px solid var(--line);
   border-radius: 18px;
-  padding: 48px;
+  padding: 56px 48px;
   position: relative;
   overflow: hidden;
+}
+
+/* Hand-composed "star river" backdrop SVG: meandering spine of connected
+   anchor stars flowing across full card width. Sits behind .footer-grid
+   so content reads cleanly on top. */
+.footer-constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.footer-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
 }
 
 .footer-title {
@@ -815,13 +879,6 @@ body {
   color: var(--fg-dim);
   line-height: 1.7;
   margin-bottom: 32px;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: center;
 }
 
 .footer-cta {
@@ -842,13 +899,19 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+a.info-item:hover {
+  opacity: 0.7;
 }
 
 .info-icon {
   display: inline-block;
   width: 26px;
   height: 26px;
-  border: 1px solid rgba(255, 80, 80, 0.3);
+  border: 1px solid rgba(78, 160, 255, 0.3);
   border-radius: 50%;
   text-align: center;
   line-height: 24px;
@@ -857,20 +920,10 @@ body {
 
 .footer-bottom {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-top: 32px;
+  margin-top: 24px;
   padding: 0 24px;
-}
-
-.footer-social {
-  display: flex;
-  gap: 16px;
-}
-.footer-social a {
-  color: var(--fg-dim);
-  text-decoration: none;
-  font-size: 14px;
 }
 
 .copyright {
@@ -966,21 +1019,29 @@ body {
     background: rgba(20, 28, 45, 0.4);
   }
 
-  /* What I Do / Work / Thinking: 2-column grids on tablet. */
+  /* What I Do / Work / Thinking on tablet: auto-fit instead of a hard
+     2-col, so 1100-ish viewports keep all three cards on one row
+     (avoids the "orphan card alone in row 2" pattern). The grid
+     drops to 2-col automatically when the viewport can't fit 3 cards
+     at min 280px each. Mobile rule below forces 1-col. */
   .services-grid,
   .work-grid,
   .thinking-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
   }
-  /* Vertical separator only makes sense for 3-col desktop layout —
-     wraps to N-col grid here. Switch to a horizontal divider between
-     wrapped cards instead. */
+  /* Vertical separator only makes sense for the 3-col desktop layout
+     (full-width row with cards spanning equally). When auto-fit drops
+     to a 2-col arrangement the separator becomes asymmetric, so we
+     remove it whenever this tablet block applies. */
   .service:not(:last-child) {
     border-right: none;
     padding-right: 0;
   }
 
+  .footer-card {
+    padding: 56px 36px;
+  }
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 32px;
@@ -1025,13 +1086,16 @@ body {
     padding: 64px 20px 80px;
   }
 
-  /* Phone: collapse what-i-do/work/thinking/footer to single col. */
+  /* Phone: collapse what-i-do/work/thinking to single col. */
   .services-grid,
   .work-grid,
-  .thinking-grid,
-  .footer-grid {
+  .thinking-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .footer-card {
+    padding: 48px 24px;
   }
   /* About on phone: single col stack with photo BETWEEN title and body
      (visually anchors the person before describing what they do).
@@ -1087,8 +1151,18 @@ body {
     scroll-snap-align: start;
   }
 
-  /* Cards on mobile: visuals shrink so they don't dominate the text. */
-  .work-visual,
+  /* Cards on mobile: visuals shrink so they don't dominate the text.
+     .work-visual is sized explicitly because its inline SVG fills the
+     container with width:100% / height:100% — letting height go auto
+     would collapse the SVG to 0px height. .thinking-visual + service
+     icons still use legacy JS-injected SVGs with intrinsic size, so
+     `height: auto` works fine for them. */
+  .work-visual {
+    top: 12px;
+    right: 12px;
+    width: 130px;
+    height: 130px;
+  }
   .thinking-visual,
   .service-icon { max-width: 200px; height: auto; }
 

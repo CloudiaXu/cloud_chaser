@@ -246,44 +246,36 @@ if (photoRing) {
 // See logo design memory: handcraft semantic marks, only use sampling
 // for atmospheric/decorative density.
 
-// Selected Work: visuals on RIGHT side of each card (sphere / torus / ROBOT).
-const workCrops = [
-  { x: 245, y: 1075, w: 145, h: 175 },  // ELEMI — dense sphere
-  { x: 510, y: 1075, w: 130, h: 175 },  // 客服流程優化 — stacked torus
-  { x: 750, y: 1065, w: 140, h: 185 },  // 電商導購機器人 — ROBOT
-];
-document.querySelectorAll<HTMLElement>('.work-visual').forEach((el, i) => {
-  sampleSvgFromImage(el, {
-    imagePath: REF,
-    crop: workCrops[i] ?? workCrops[0],
-    threshold: 0.12,
-    count: 200,
-    svgSize: 78,
-    drawLinks: true,
-    linkDistance: 18,
-    color: '#ff5252',
-    maxDotRadius: 2.6,
-  }).catch((e) => console.warn('work visual sample failed', i, e));
-});
+// Selected Work: each card's visual is now a hand-composed inline SVG
+// in index.html (profile head / flow chain / shopping bot). Sampling
+// produced unreadable text-shaped dot piles at this size; semantic
+// silhouettes need intentional triangulation to read.
+// (See feedback_logo_design_approach.md — handcraft semantic marks.)
 
-// Thinking: 3 card visuals on RIGHT side of each card (different globes).
-const thinkingCrops = [
-  { x: 220, y: 1305, w: 130, h: 165 },
-  { x: 480, y: 1305, w: 130, h: 165 },
-  { x: 735, y: 1305, w: 130, h: 165 },
-];
-document.querySelectorAll<HTMLElement>('.thinking-visual').forEach((el, i) => {
-  sampleSvgFromImage(el, {
-    imagePath: REF,
-    crop: thinkingCrops[i] ?? thinkingCrops[0],
-    threshold: 0.13,
-    count: 150,
-    svgSize: 62,
-    drawLinks: true,
-    linkDistance: 16,
-    color: '#ff5252',
-    maxDotRadius: 2.4,
-  }).catch((e) => console.warn('thinking visual sample failed', i, e));
+// Thinking: 3 card visuals are now hand-composed inline SVG in
+// index.html (stuck-gear / handshake / rocket). Sampling produced
+// uninterpretable red dot scatter at 120px — semantic icons need
+// intentional star placement to read at this size.
+// (See feedback_logo_design_approach.md — handcraft semantic marks.)
+
+// Tracing-reference controls (dev only):
+//   T = hide / show
+//   Y = cycle opacity: normal → faded → bright → normal
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  const refs = document.querySelectorAll<HTMLElement>('.ref-trace');
+  if (!refs.length) return;
+  if (k === 't') refs.forEach((el) => el.classList.toggle('hidden'));
+  if (k === 'y') {
+    refs.forEach((el) => {
+      const cur =
+        el.classList.contains('faded') ? 'faded' :
+        el.classList.contains('bright') ? 'bright' : 'normal';
+      el.classList.remove('faded', 'bright');
+      const next = cur === 'normal' ? 'faded' : cur === 'faded' ? 'bright' : 'normal';
+      if (next !== 'normal') el.classList.add(next);
+    });
+  }
 });
 
 // Design guide controls (dev only):
