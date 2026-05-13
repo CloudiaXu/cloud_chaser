@@ -35,9 +35,10 @@ export function nebulaize(count: number): Float32Array {
       // Mid 30% — silhouette body.
       out[i] = 0.40 + (r - 0.55) / 0.30 * 0.30;
     } else {
-      // Bottom 55% — atmospheric dust. Floor 0.10 keeps them faintly
-      // visible so the bird's outer extents don't go fully invisible.
-      out[i] = 0.10 + r / 0.55 * 0.25;
+      // Bottom 55% — atmospheric dust. Floor lowered to 0.06 to deepen
+      // contrast with bright anchor stars (matches footer constellation
+      // visual: anchors stand out crisply against dim atmospheric scatter).
+      out[i] = 0.06 + r / 0.55 * 0.25;
     }
   }
   return out;

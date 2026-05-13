@@ -918,6 +918,18 @@ a.info-item:hover {
   font-size: 11px;
 }
 
+/* Brand logos for social info-items: official brand assets served
+   from /public/logos/. Sized to match the .info-icon footprint;
+   no border-radius override so each brand's native corner shape
+   (LINE rounded square, Instagram squircle, LinkedIn square) is
+   preserved as the brand owner intends. */
+.brand-logo {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: block;
+}
+
 .footer-bottom {
   display: flex;
   justify-content: center;

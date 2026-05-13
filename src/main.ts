@@ -120,10 +120,15 @@ const AMBIENT_COUNT = TOTAL - BIRD_COUNT - WAVE_COUNT;
   // the eye sees clear highlight clusters (head/wing apex/wing tip)
   // rather than a uniformly-sparkly cloud. Coords follow the bird's
   // current center (17, -3.5) — shift if you re-center the bird.
+  // Boosted to read as "constellation anchor stars" (matches footer
+  // LET'S COMBINE star-river visual language), plus body + tail spots
+  // so the bird's skeletal structure is implied by the bright nodes.
   addHotSpots(bird.positions, birdNebula, [
-    { x: 3,   y: 0.5, radius: 9,  boost: 0.55 }, // head / breast
-    { x: 25,  y: 4.5, radius: 11, boost: 0.50 }, // wing apex
-    { x: 41,  y: 1.5, radius: 8,  boost: 0.45 }, // wing tip far right
+    { x: -7,  y: -2,  radius: 7,  boost: 0.65 }, // tail
+    { x: 3,   y: 0.5, radius: 9,  boost: 0.85 }, // head / breast
+    { x: 12,  y: -2,  radius: 8,  boost: 0.70 }, // body / wing root
+    { x: 25,  y: 4.5, radius: 11, boost: 0.80 }, // wing apex
+    { x: 41,  y: 1.5, radius: 8,  boost: 0.75 }, // wing tip far right
   ]);
 
   // Wave brightness preserved as-is so it reads as the same blue
