@@ -6,7 +6,6 @@ import { chainFromSvg } from './geometry/chainFromSvg';
 import { nebulaize, addHotSpots } from './geometry/nebulaize';
 import { MouseAttractor } from './interaction/mouse';
 import { ringConstellation } from './visuals/svgClusters';
-import { sampleSvgFromImage } from './visuals/sampleSvg';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#scene')!;
 const scene = new Scene(canvas);
@@ -35,7 +34,7 @@ const AMBIENT_COUNT = TOTAL - BIRD_COUNT - WAVE_COUNT;
 
 (async () => {
   const bird = await sampleBirdFromImage({
-    imagePath: '/reference.png',
+    imagePath: `${import.meta.env.BASE_URL}reference.png`,
     crop: { x: 350, y: 15, w: 530, h: 540 },
     threshold: 0.32,
     count: BIRD_COUNT,
@@ -74,7 +73,7 @@ const AMBIENT_COUNT = TOTAL - BIRD_COUNT - WAVE_COUNT;
   // baseY=-19 pushes the band well below CTA so the now-taller wave
   // doesn't crowd the bird above.
   const wave = await chainFromSvg({
-    svgPath: '/chain.svg',
+    svgPath: `${import.meta.env.BASE_URL}chain.svg`,
     viewBoxWidth: 1400,
     viewBoxHeight: 400,
     startX: -42,
@@ -93,7 +92,7 @@ const AMBIENT_COUNT = TOTAL - BIRD_COUNT - WAVE_COUNT;
   // pixels. Threshold tuned to keep a few hundred candidate pixels while
   // skipping tiny gray text remnants.
   const ambient = await sampleBirdFromImage({
-    imagePath: '/reference.png',
+    imagePath: `${import.meta.env.BASE_URL}reference.png`,
     crop: { x: 360, y: 30, w: 510, h: 380 },
     threshold: 0.20,
     count: AMBIENT_COUNT,
@@ -218,12 +217,10 @@ document.querySelectorAll<HTMLElement>('[data-cta]').forEach((btn) => {
 });
 
 // ────────────────────────────────────────────────────────────────────
-// SVG visuals: sampled directly from the mockup so each card's shape
-// matches the design (cube, flowchart, orbit, robot, torus, sphere).
-// Crops are in image-pixel coords against the 887x1774 reference.
+// Card decorations (hand-composed inline SVG in index.html).
+// Procedural sampling was removed in favour of intentional star
+// placement — see feedback_logo_design_approach.md.
 // ────────────────────────────────────────────────────────────────────
-
-const REF = '/reference.png';
 
 // About photo halo: procedural dense ring of dots reads as atmospheric
 // "halo glow" around the portrait — better than handcrafted sparse
