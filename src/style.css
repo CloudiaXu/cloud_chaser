@@ -30,6 +30,15 @@ body {
   overflow-x: hidden;
 }
 
+/* Smooth-scroll for in-page anchor jumps (nav menu, hero CTA → contact).
+   Honours the user's reduced-motion preference. */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 body {
   min-height: 100vh;
   position: relative;
