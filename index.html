@@ -9,8 +9,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#05070d" />
+    <link rel="canonical" href="https://cloudiaxu.github.io/cloud_chaser/" />
     <title>XiaoYun Xu — Connect the Dots, Create Value.</title>
     <meta name="description" content="我在打造 AI 客服產品 ELEMI，讓客服變成自動成交系統。" />
+    <meta name="author" content="XiaoYun Xu" />
 
     <!--
       Social-share preview. og:image and twitter:image MUST be absolute
@@ -26,6 +28,10 @@
     <meta property="og:title" content="XiaoYun Xu — Connect the Dots, Create Value." />
     <meta property="og:description" content="我在打造 AI 客服產品 ELEMI，讓客服變成自動成交系統。" />
     <meta property="og:image" content="https://cloudiaxu.github.io/cloud_chaser/og-image.png" />
+    <!-- og:image:secure_url is a duplicate of og:image, but some older
+         FB/LINE crawlers explicitly look for the *:secure_url variant
+         to confirm the image is served over https. Cheap belt-&-braces. -->
+    <meta property="og:image:secure_url" content="https://cloudiaxu.github.io/cloud_chaser/og-image.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -36,6 +42,42 @@
     <meta name="twitter:description" content="我在打造 AI 客服產品 ELEMI，讓客服變成自動成交系統。" />
     <meta name="twitter:image" content="https://cloudiaxu.github.io/cloud_chaser/og-image.png" />
     <meta name="twitter:image:alt" content="CONNECT THE DOTS, CREATE VALUE. — XiaoYun Xu" />
+
+    <!--
+      JSON-LD structured data for Google / Bing rich results. Declaring
+      the page as a Person + WebSite lets search engines render a richer
+      preview (name, image, social links) when the URL is shared in
+      search-result thumbnails or knowledge cards. Pure SEO; social
+      crawlers ignore this block (they use og:* above).
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://cloudiaxu.github.io/cloud_chaser/#person",
+          "name": "XiaoYun Xu",
+          "alternateName": "cloudia",
+          "url": "https://cloudiaxu.github.io/cloud_chaser/",
+          "image": "https://cloudiaxu.github.io/cloud_chaser/og-image.png",
+          "description": "我在打造 AI 客服產品 ELEMI，讓客服變成自動成交系統。",
+          "sameAs": [
+            "https://www.linkedin.com/in/xyxu/",
+            "https://www.instagram.com/cloudia.life"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://cloudiaxu.github.io/cloud_chaser/#website",
+          "url": "https://cloudiaxu.github.io/cloud_chaser/",
+          "name": "XiaoYun Xu — Connect the Dots, Create Value.",
+          "inLanguage": "zh-TW",
+          "author": { "@id": "https://cloudiaxu.github.io/cloud_chaser/#person" }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <!-- Design guide overlay. Hidden by default; press G to toggle, F to cycle opacity. -->

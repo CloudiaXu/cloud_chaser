@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+# Runs on every push to main, and can be triggered manually from the
+# Actions tab if a previous deploy failed or you want to re-rasterise
+# og-image.png without changing source.
+#
+# Security note: this workflow consumes ZERO untrusted user input —
+# no PR titles, comments, ref names, or commit messages reach a `run:`
+# step, so the workflow-injection vectors flagged at
+# https://github.blog/security/vulnerability-research/how-to-catch-github-actions-workflow-injections-before-attackers-do/
+# don't apply here. The only `${{ ... }}` interpolation is
+# steps.deployment.outputs.page_url, which is emitted by an internal
+# step of this same workflow, not external input.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One Pages deploy at a time. Don't cancel an in-flight production
+# deploy — let it finish so the published artifact is stable.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # rsvg-convert is what rasterises og-image.svg → og-image.png.
+      # It's not on the runner by default; librsvg2-bin from apt is.
+      - name: Install rsvg-convert
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+
+      - run: npm ci
+
+      # Regenerate bird.svg + og-image.png from public/reference.png
+      # so the share card always matches the latest brand asset on
+      # main. (bird.svg is gitignored; og-image.png is committed but
+      # rebuilt here in case it drifted.)
+      - run: npm run og
+
+      # Vite build: rewrites root-relative paths to /cloud_chaser/...
+      # and emits hashed JS/CSS bundles into dist/.
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
