@@ -1,13 +1,16 @@
 /**
- * BIRD FROM IMAGE
+ * BIRD FROM IMAGE — browser front-end
  * ─────────────────────────────────────────────────────────────────
  * Load the reference mockup, crop to the bird region, threshold to
  * isolate bright pixels (the bird's particles in the original art),
- * and sample N positions in world coordinates.
+ * and sample N positions in Three.js world coordinates.
  *
- * This trades the "every dot has a math reason" purity for
- * "the silhouette literally matches the reference."
+ * Pixel sampling + shuffle are delegated to ./birdSampling.mjs so
+ * the og-image build script can reuse THE SAME algorithm in Node.
+ * This file's job is canvas decoding + world-space transform.
  */
+
+import { sampleBrightPixels, shuffleInPlace } from './birdSampling.mjs';
 
 export interface SampleOptions {
   /** Path served by Vite (e.g. /reference.png). */
@@ -53,22 +56,16 @@ export async function sampleBirdFromImage(opts: SampleOptions): Promise<BirdSamp
   );
   const data = ctx.getImageData(0, 0, opts.crop.w, opts.crop.h).data;
 
-  // Pass 1: collect candidate pixels above brightness threshold.
-  // Step by 1 px would over-densify; step by 2 keeps it light and fast.
-  const candidates: { px: number; py: number; brightness: number }[] = [];
-  const step = 2;
-  for (let py = 0; py < opts.crop.h; py += step) {
-    for (let px = 0; px < opts.crop.w; px += step) {
-      const idx = (py * opts.crop.w + px) * 4;
-      const r = data[idx] / 255;
-      const g = data[idx + 1] / 255;
-      const b = data[idx + 2] / 255;
-      const brightness = (r + g + b) / 3;
-      if (brightness > opts.threshold) {
-        candidates.push({ px, py, brightness });
-      }
-    }
-  }
+  // Pass 1: shared sampler — same code path the og-image builder runs.
+  // Buffer is already pre-cropped to opts.crop.w × opts.crop.h, so we
+  // pass a 0-origin crop and use the buffer's own width.
+  const candidates = sampleBrightPixels({
+    rgba: data,
+    imageWidth: opts.crop.w,
+    crop: { x: 0, y: 0, w: opts.crop.w, h: opts.crop.h },
+    threshold: opts.threshold,
+    step: 2,
+  });
 
   if (candidates.length < opts.count) {
     throw new Error(
@@ -76,10 +73,10 @@ export async function sampleBirdFromImage(opts: SampleOptions): Promise<BirdSamp
     );
   }
 
-  // Pass 2: random subsample to exactly `count`.
+  // Pass 2: random subsample to exactly `count` (shared shuffle).
   // Brightness-weighted would clump on the brightest pixels — for now uniform
   // sampling preserves outline coverage. (Easy knob if you want it later.)
-  shuffle(candidates);
+  shuffleInPlace(candidates);
   const picked = candidates.slice(0, opts.count);
 
   // Map pixel coords → world coords.
@@ -112,11 +109,4 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
     img.src = src;
   });
-}
-
-function shuffle<T>(arr: T[]): void {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
 }
