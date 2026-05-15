@@ -217,6 +217,37 @@ document.querySelectorAll<HTMLElement>('[data-cta]').forEach((btn) => {
 });
 
 // ────────────────────────────────────────────────────────────────────
+// Article dialogs. <dialog id="article-<slug>"> blocks are injected
+// into index.html at build time by scripts/build_articles.mjs from
+// posts/*.md. A thinking-card's "閱讀全文 →" link declares which slug
+// to open via `data-article="<slug>"`. We open with the native
+// dialog.showModal() so the browser handles focus trap, ESC-to-close,
+// and body scroll lock for free.
+// ────────────────────────────────────────────────────────────────────
+document.querySelectorAll<HTMLAnchorElement>('a[data-article]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    const slug = link.dataset.article;
+    if (!slug) return;
+    const dialog = document.getElementById(`article-${slug}`) as HTMLDialogElement | null;
+    if (!dialog) return;
+    event.preventDefault();
+    dialog.showModal();
+  });
+});
+
+// Each dialog: close on backdrop click (the dialog itself receives the
+// event when you click outside the inner <article>) and on the ×
+// button. ESC is handled natively by <dialog>.
+document.querySelectorAll<HTMLDialogElement>('dialog.article-dialog').forEach((dialog) => {
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog
+    .querySelector<HTMLButtonElement>('[data-close-dialog]')
+    ?.addEventListener('click', () => dialog.close());
+});
+
+// ────────────────────────────────────────────────────────────────────
 // Card decorations (hand-composed inline SVG in index.html).
 // Procedural sampling was removed in favour of intentional star
 // placement.

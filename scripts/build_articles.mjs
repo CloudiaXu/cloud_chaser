@@ -1,0 +1,151 @@
+/**
+ * Inject one <dialog> per article into /index.html.
+ *
+ * Each .md in /posts becomes a hidden <dialog> element between the
+ * markers below in index.html. JS in src/main.ts opens the right
+ * dialog when a thinking-card's link is clicked. No multi-page,
+ * no client-side router — just native <dialog>.
+ *
+ *   <!-- ARTICLES:START -->   ← injection region opens
+ *   ... generated dialogs ...
+ *   <!-- ARTICLES:END -->     ← injection region closes
+ *
+ * The replacement is idempotent: same .md input → byte-identical
+ * output. If the regenerated block equals what's already in
+ * index.html, the script SKIPS the write — important so `npm run
+ * dev` doesn't trigger a Vite HMR reload on every save.
+ *
+ * Adding a new article:
+ *   1. Drop posts/<slug>.md with frontmatter (title/description/date/slug).
+ *   2. On the home page, wire a card link to:
+ *        <a href="#" data-article="<slug>" class="link-arrow">閱讀全文 →</a>
+ *   3. Run `npm run articles` (or any of dev/build — chained in package.json).
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { marked } from 'marked';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(here, '..');
+const POSTS_DIR = path.join(ROOT, 'posts');
+const INDEX_HTML = path.join(ROOT, 'index.html');
+const MARK_START = '<!-- ARTICLES:START -->';
+const MARK_END = '<!-- ARTICLES:END -->';
+
+marked.setOptions({ gfm: true, breaks: false });
+
+// ─── frontmatter ────────────────────────────────────────────────────
+function parseFrontmatter(md) {
+  const m = md.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!m) return { data: {}, body: md };
+  const data = {};
+  for (const line of m[1].split(/\r?\n/)) {
+    const i = line.indexOf(':');
+    if (i > 0) {
+      const k = line.slice(0, i).trim();
+      const v = line.slice(i + 1).trim();
+      if (k) data[k] = v;
+    }
+  }
+  return { data, body: m[2] };
+}
+
+function escapeAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// ─── per-article dialog template ────────────────────────────────────
+function renderDialog({ slug, title, date, bodyHTML }) {
+  const id = `article-${slug}`;
+  const titleId = `${id}-title`;
+  const dateDisplay = date.replaceAll('-', '.');
+  return `<dialog id="${id}" class="article-dialog" aria-labelledby="${titleId}">
+      <button class="article-dialog__close" data-close-dialog aria-label="關閉文章">×</button>
+      <article class="article">
+        <header class="article-header">
+          <time class="article-date" datetime="${date}">${dateDisplay}</time>
+          <h1 id="${titleId}" class="article-title">${escapeAttr(title)}</h1>
+        </header>
+        <div class="article-body">
+${bodyHTML}
+        </div>
+      </article>
+    </dialog>`;
+}
+
+// ─── build all dialogs ──────────────────────────────────────────────
+const files = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md')).sort();
+const dialogs = [];
+
+for (const file of files) {
+  const md = fs.readFileSync(path.join(POSTS_DIR, file), 'utf8');
+  const { data, body } = parseFrontmatter(md);
+
+  const slug = data.slug || file.replace(/\.md$/, '');
+  for (const required of ['title', 'date']) {
+    if (!data[required]) {
+      throw new Error(`posts/${file} is missing frontmatter field: ${required}`);
+    }
+  }
+
+  // Render body; drop the leading <h1>title</h1> the .md repeats
+  // (the article-header already prints it, double-show looks like a bug).
+  let bodyHTML = marked.parse(body);
+  const titleEscaped = data.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  bodyHTML = bodyHTML.replace(
+    new RegExp(`^\\s*<h1[^>]*>\\s*${titleEscaped}\\s*<\\/h1>`, 'i'),
+    ''
+  );
+
+  // Demote remaining <h1>s in body → <h2>. The .md uses `#` for every
+  // section, which would produce multiple H1s per page — semantically
+  // wrong, and breaks SEO/a11y heading hierarchy.
+  bodyHTML = bodyHTML
+    .replace(/<h1(\b[^>]*)>/g, '<h2$1>')
+    .replace(/<\/h1>/g, '</h2>');
+
+  dialogs.push(renderDialog({ slug, title: data.title, date: data.date, bodyHTML }));
+  console.log(`  ${slug.padEnd(28)} ${data.title}`);
+}
+
+// ─── replace between markers in index.html ──────────────────────────
+let html = fs.readFileSync(INDEX_HTML, 'utf8');
+const startIdx = html.indexOf(MARK_START);
+const endIdx = html.indexOf(MARK_END);
+if (startIdx < 0 || endIdx < 0) {
+  throw new Error(
+    `index.html is missing injection markers. Add this near </body>:\n` +
+    `    ${MARK_START}\n    ${MARK_END}\n`
+  );
+}
+if (endIdx < startIdx) {
+  throw new Error('ARTICLES:END appears before ARTICLES:START in index.html');
+}
+
+// Detect leading indentation of the START marker so generated dialogs
+// nest visually instead of dumping flush-left.
+const lineStart = html.lastIndexOf('\n', startIdx) + 1;
+const indent = html.slice(lineStart, startIdx);
+
+const block =
+  MARK_START + '\n' +
+  indent + '<!-- Generated by scripts/build_articles.mjs — do not edit by hand. -->\n' +
+  dialogs.map((d) => indent + d).join('\n') + '\n' +
+  indent + MARK_END;
+
+const before = html.slice(0, startIdx);
+const after = html.slice(endIdx + MARK_END.length);
+const next = before + block + after;
+
+if (next === html) {
+  console.log(`index.html unchanged — skipped write (${dialogs.length} dialogs).`);
+} else {
+  fs.writeFileSync(INDEX_HTML, next);
+  console.log(`index.html updated — ${dialogs.length} dialog(s) injected.`);
+}

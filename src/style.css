@@ -1215,3 +1215,207 @@ a.info-item:hover {
     text-align: center;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Article dialog — native <dialog> opened by thinking-card clicks.
+   Generated dialogs live in index.html between ARTICLES markers
+   (see scripts/build_articles.mjs). Native dialog handles focus
+   trap, ESC-to-close, and body scroll lock for free.
+   ───────────────────────────────────────────────────────────────────── */
+
+.article-dialog {
+  /* Native dialog defaults to display:block when open and display:none
+     when closed; we keep that so reset utilities don't fight us. */
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 0;
+  width: min(760px, calc(100vw - 32px));
+  max-height: 88vh;
+  overflow-y: auto;
+  /* True vertical+horizontal centring. <dialog>.showModal() places the
+     element in the top layer which is viewport-sized; margin:auto on
+     all four sides distributes remaining space evenly, so the dialog
+     sits dead-centre of the viewport regardless of article length. */
+  margin: auto;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(78, 160, 255, 0.06) inset;
+}
+
+/* Style the native ::backdrop. Without this, dialog gets a near-opaque
+   default grey — too heavy against the brand dark palette. */
+.article-dialog::backdrop {
+  background: rgba(2, 4, 9, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* × close button — top-right inside the dialog, always reachable
+   even after scrolling deep into a long article (position: sticky). */
+.article-dialog__close {
+  position: sticky;
+  top: 14px;
+  /* float-right via margin-left:auto inside a flex would need a
+     wrapper; sticky + transform is simpler. */
+  margin-left: auto;
+  margin-right: 14px;
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(5, 7, 13, 0.8);
+  color: var(--fg-dim);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+.article-dialog__close:hover {
+  color: var(--fg);
+  border-color: var(--accent-soft);
+  background: rgba(78, 160, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.article {
+  max-width: 640px;
+  margin: 0 auto;
+  /* Negative top margin pulls the article up under the sticky close
+     button so it doesn't waste vertical space above the title. */
+  padding: 0 32px 56px;
+  margin-top: -24px;
+}
+
+.article-header {
+  margin-bottom: 56px;
+  text-align: center;
+}
+.article-date {
+  display: block;
+  font-size: 13px;
+  color: var(--fg-dim);
+  letter-spacing: 0.18em;
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.article-title {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+/* Body typography — optimised for mixed zh-TW + Latin prose. */
+.article-body {
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--fg);
+  /* Hanging punctuation; lets CJK punctuation sit at margins cleanly. */
+  hanging-punctuation: allow-end;
+}
+.article-body p {
+  margin: 0 0 1.4em;
+}
+.article-body p:last-child { margin-bottom: 0; }
+
+/* The markdown source uses `#` for both the main title and every
+   section heading. Build script strips the leading duplicate, but the
+   rest still render as <h1>. Style them as section heads. */
+.article-body h1,
+.article-body h2 {
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  margin: 2.4em 0 0.9em;
+}
+.article-body h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 2em 0 0.6em;
+}
+
+/* Quotes — the article leans on `> 一句話` for punch lines.
+   Left bar in brand blue, slightly larger, slightly muted but still
+   high-contrast (it's the line the reader is supposed to remember). */
+.article-body blockquote {
+  margin: 1.8em 0;
+  padding: 0.2em 0 0.2em 22px;
+  border-left: 3px solid var(--accent);
+  color: var(--fg);
+  font-size: 18px;
+  line-height: 1.7;
+}
+.article-body blockquote p {
+  margin: 0;
+}
+.article-body blockquote + blockquote {
+  margin-top: -0.6em;
+}
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1.4em;
+  padding-left: 22px;
+}
+.article-body li {
+  margin: 0.4em 0;
+}
+.article-body li::marker {
+  color: var(--accent-soft);
+}
+
+/* Horizontal rule between sections — a hairline, not a hard divider.
+   The article uses `---` quite often, so subtle reads better. */
+.article-body hr {
+  border: 0;
+  height: 1px;
+  background: var(--line);
+  margin: 3em auto;
+  max-width: 120px;
+}
+
+.article-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.article-body a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.article-body strong { color: var(--fg); font-weight: 600; }
+.article-body em     { color: var(--fg); }
+.article-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  background: rgba(78, 160, 255, 0.1);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .article-dialog {
+    width: 100vw;
+    max-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    border: 0;
+  }
+  .article-dialog__close {
+    top: 10px;
+    margin-right: 10px;
+  }
+  .article {
+    padding: 0 18px 48px;
+  }
+  .article-header { margin-bottom: 40px; }
+  .article-body   { font-size: 16px; line-height: 1.8; }
+}

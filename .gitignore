@@ -29,3 +29,6 @@ src/svg/Screenshot*.png
 # by public/og-image.svg's rsvg-convert pass. Lives in public/
 # (librsvg refuses sibling <image href> across directory boundaries).
 /public/bird.svg
+
+# (removed: /thinking/ — articles now inject as <dialog> into index.html
+# at build time, no separate pages generated.)
